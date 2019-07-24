@@ -31,10 +31,10 @@ def check_alerts():
     """
     app = create_app(os.getenv('FLASK_CONFIG') or 'default')
     with app.app_context():
-        next = next_timestamp(datetime.now())
+        next_t = next_timestamp(datetime.now())
         alerts = []
-        for alert in SMSAlert.query.filter_by(date=next.date()).all():
-            if alert.time.hour == next.hour and alert.time.minute == next.minute:
+        for alert in SMSAlert.query.filter_by(date=next_t.date()).all():
+            if alert.time.hour == next_t.hour and alert.time.minute == next_t.minute:
                 alerts.append(alert)
         students = StudentProfile.query.filter(StudentProfile.phone_number != None).all()
 

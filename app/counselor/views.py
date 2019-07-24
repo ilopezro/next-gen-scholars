@@ -107,6 +107,14 @@ def colleges():
 @login_required
 @counselor_required
 def upload_college_file():
+
+    scorecard_key = os.environ.get('COLLEGE_SCORECARD_KEY') or None
+
+    if not scorecard_key:
+        print('Add College Scorecard API Key')
+        return
+
+
     if request.method == 'POST':
        
        #TODO: figure out how to update all of them (7059?)
@@ -117,7 +125,8 @@ def upload_college_file():
        
         for school_id in df['UINTID']:
             #API caps at 1000 requests per hour
-            request_data = requests.get('https://api.data.gov/ed/collegescorecard/v1/schools?id=' + school_id + '&api_key='+key)
+            request_data = requests.get('https://api.data.gov/ed/collegescorecard/v1/schools?id=' + school_id +\
+             '&api_key=' + scorecard_key)
             latest_data = dict(request_data.json()).get('results')[0].get('latest')
             basic_data = dict(request_data.json()).get('results')[0].get('school')
 

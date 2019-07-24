@@ -29,6 +29,14 @@ import os
 import datetime
 import csv
 import io
+
+# import pandas as pd
+import requests
+from bs4 import BeautifulSoup
+import urllib
+import json
+
+
 # TODO: remove before production?
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
@@ -94,63 +102,122 @@ def colleges():
     colleges = College.query.all()
     return render_template('counselor/colleges.html', colleges=colleges)
 
-
 @csrf.exempt
 @counselor.route('/upload_colleges', methods=['GET', 'POST'])
 @login_required
 @counselor_required
 def upload_college_file():
     if request.method == 'POST':
-        f = request.files['file']
+       
+       #TODO: figure out how to update all of them (7059?)
+        reader = pd.read_csv('https://ed-public-download.app.cloud.gov/downloads/Most-Recent-Cohorts-All-Data-Elements.csv',\
+                     chunksize=3000)
 
-        stream = io.StringIO(f.stream.read().decode("UTF8"), newline=None)
-        csv_input = csv.reader(stream)
-        header_row = True
-        for row in csv_input:
-            if header_row:
-                header_row = False
-                continue
-            if len(row) >= 8 and any(row):
-                # check that there are at least eight columns
-                # and the row is not completely blank
-                college = College.query.filter_by(name=row[0]).first()
-                # College didn't already exist in database, so add it.
-                if college is None:
-                    college = College(
-                        name=row[0],
-                        description=row[1],
-                        regular_deadline=datetime.datetime.strptime(
-                            row[2], "%m/%d/%y") if row[2] else None,
-                        early_deadline=datetime.datetime.strptime(
-                            row[3], "%m/%d/%y") if row[3] else None,
-                        fafsa_deadline=datetime.datetime.strptime(
-                            row[4], "%m/%d/%y") if row[4] else None,
-                        acceptance_deadline=datetime.datetime.strptime(
-                            row[5], "%m/%d/%y") if row[5] else None,
-                        scholarship_deadline=datetime.datetime.strptime(
-                            row[6], "%m/%d/%y") if row[6] else None,
-                        image = row[7]
-                    )
-                    College.retrieve_college_info(college)
-                # else update the existing college
-                else:
-                    college.description = row[1]
-                    college.regular_deadline = datetime.datetime.strptime(
-                            row[2], "%m/%d/%y") if row[2] else None
-                    college.early_deadline = datetime.datetime.strptime(
-                            row[3], "%m/%d/%y") if row[3] else None
-                    college.fafsa_deadline = datetime.datetime.strptime(
-                            row[4], "%m/%d/%y") if row[4] else None
-                    college.acceptance_deadline = datetime.datetime.strptime(
-                            row[5], "%m/%d/%y") if row[5] else None
-                    college.scholarship_deadline = datetime.datetime.strptime(
-                            row[6], "%m/%d/%y") if row[6] else None
-                    college.image = row[7]
-                    College.retrieve_college_info(college)
-                db.session.add(college)
-        db.session.commit()
+        df = reader.get_chunk(3000)
+       
+        for school_id in df['UINTID']:
+            #API caps at 1000 requests per hour
+            request_data = requests.get('https://api.data.gov/ed/collegescorecard/v1/schools?id=' + school_id + '&api_key='+key)
+            latest_data = dict(request_data.json()).get('results')[0].get('latest')
+            basic_data = dict(request_data.json()).get('results')[0].get('school')
+
+            #basic data about the shcool
+            name = basic_data.get('name')
+            school_url = basic_data.get('school_url')
+            price_calculator_url = basic_data.get('price_calculator_url')
+
+            #location stuff
+            location = basic_data.get('city') + ', ' + basic_data.get('state')
+            long_lat = dict(request_data.json()).get('results')[0].get('location')
+
+
+            #admission data stuff
+            admission_data = latest_data.get('admissions')
+            admission_rate = admission_data.get('admission_rate').get('overall')
+
+            sat_data = admission_data.get('sat_scores') #TODO: parse these out so they are storeable in DB
+            act_data = admission_data.get('act_scores') #TODO: parse these out
+
+
+
+            #school data
+            school_costs = latest_data.get('cost')
+            private_costs = admission_data.get('cost').get('net_price').get('private') #TODO: parse these out so DB can read
+            public_costs = admission_data.get('cost').get('net_price').get('public')#TODO: parse these out 
+
+
+
+            # school_population = school_costs.get('attendance').get('academic_year')
+    
+            
+
+            #student data
+            student_data = latest_data.get('student')
+            racial_makeup = student_data.get('demographics').get('race_ethnicity') #note this is a dictionary
+
+
+
+
+
+
+
+
+            
+            
+
+
+                     
+        # stream = io.StringIO(f.stream.read().decode("UTF8"), newline=None)
+        # csv_input = csv.reader(stream)
+        # header_row = True
+        # for row in csv_input:
+        #     if header_row:
+        #         header_row = False
+        #         continue
+        #     if len(row) >= 8 and any(row):
+        #         # check that there are at least eight columns
+        #         # and the row is not completely blank
+        #         college = College.query.filter_by(name=row[0]).first()
+        #         # College didn't already exist in database, so add it.
+        #         if college is None:
+        #             college = College(
+        #                 name=row[0],
+        #                 description=row[1],
+        #                 regular_deadline=datetime.datetime.strptime(
+        #                     row[2], "%m/%d/%y") if row[2] else None,
+        #                 early_deadline=datetime.datetime.strptime(
+        #                     row[3], "%m/%d/%y") if row[3] else None,
+        #                 fafsa_deadline=datetime.datetime.strptime(
+        #                     row[4], "%m/%d/%y") if row[4] else None,
+        #                 acceptance_deadline=datetime.datetime.strptime(
+        #                     row[5], "%m/%d/%y") if row[5] else None,
+        #                 scholarship_deadline=datetime.datetime.strptime(
+        #                     row[6], "%m/%d/%y") if row[6] else None,
+        #                 image = row[7]
+        #             )
+        #             College.retrieve_college_info(college)
+        #         # else update the existing college
+        #         else:
+        #             college.description = row[1]
+        #             college.regular_deadline = datetime.datetime.strptime(
+        #                     row[2], "%m/%d/%y") if row[2] else None
+        #             college.early_deadline = datetime.datetime.strptime(
+        #                     row[3], "%m/%d/%y") if row[3] else None
+        #             college.fafsa_deadline = datetime.datetime.strptime(
+        #                     row[4], "%m/%d/%y") if row[4] else None
+        #             college.acceptance_deadline = datetime.datetime.strptime(
+        #                     row[5], "%m/%d/%y") if row[5] else None
+        #             college.scholarship_deadline = datetime.datetime.strptime(
+        #                     row[6], "%m/%d/%y") if row[6] else None
+        #             college.image = row[7]
+        #             College.retrieve_college_info(college)
+        #         db.session.add(college)
+        # db.session.commit()
         return redirect(url_for('counselor.colleges'))
     return render_template('counselor/upload_colleges.html')
+
+
+
 
 
 @counselor.route('/new-user', methods=['GET', 'POST'])

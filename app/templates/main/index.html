@@ -46,7 +46,7 @@
     <div class="twelve wide computer sixteen wide mobile column">
         <h1 class="ui dividing header">Messages</h1> <br /> 
         <div class="ui two column centered grid">
-            {{ message_option('FAFSA', 'fafsa.ed.gov',
+            {{ message_option('FAFSA', 'https://studentaid.ed.gov/sa/fafsa',
                 'https://user-images.strikinglycdn.com/res/hrscywv4p/image/upload/c_limit,fl_lossy,h_1440,w_720,f_auto,q_auto/1320747/AR-310039872_oxkllq.png', 
                 'Due on 3/2 -- Update your progress in your profile and tasks!') }}
 
@@ -63,15 +63,16 @@
     <div class="twelve wide computer sixteen wide mobile column">
         <div class="row">
             <h1 class="ui dividing header">Calendar</h1>
-            <iframe src="https://calendar.google.com/calendar/embed?src=ngs4impact%40gmail.com&ctz=America%2FLos_Angeles" style="border: 0" width="100%" height="600" frameborder="0" scrolling="no"></iframe>
+            <div style="position: relative; padding-bottom: 75%; height: 0; overflow: hidden;";>
+                <iframe src="https://calendar.google.com/calendar/embed?src=ngs4impact%40gmail.com&ctz=America%2FLos_Angeles" style="position: absolute; top:0; left: 0; width: 100%; height: 100%; border:none;"></iframe>
+            </div>
         </div>
     </div>
 
     <div class="twelve wide computer sixteen wide mobile column">
         <div class="row">
             <h1 class="ui dividing header">Survey</h1>
-            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdUGSDIw98c_E45nkGF_dYQ4gtp7vKwv1LpQxA7YcESA0j-eg/viewform?embedded=true" style="border: 0" width="100%" height="600" frameborder="0"></iframe>
-        
+            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdUGSDIw98c_E45nkGF_dYQ4gtp7vKwv1LpQxA7YcESA0j-eg/viewform?embedded=true" style="border: 0" width="100%" height="650" frameborder="0"></iframe>
         </div>
     </div>
 </div>

@@ -111,7 +111,7 @@ def colleges():
 @login_required
 @counselor_required
 def upload_college_file():
-    
+    # print('this is a test')
     # if not scorecard_key:
     #     print('Add College Scorecard API Key')
     #     return
@@ -124,9 +124,10 @@ def upload_college_file():
 
        #TODO: figure out how to update all of them (7059?)
         reader = pd.read_csv('https://ed-public-download.app.cloud.gov/downloads/Most-Recent-Cohorts-All-Data-Elements.csv',\
-                        chunksize=10)
+                        chunksize=5)
 
-        df = reader.get_chunk(10)
+        df = reader.get_chunk(5)
+        # print(df)
 
         for school_id in df['UNITID']:
             #API caps at 1000 requests per hour
@@ -139,8 +140,8 @@ def upload_college_file():
             basic_data = dict(request_data.json()).get('results')[0].get('school')
 
             #basic data about the shcool
-            name = basic_data.get('name')
-            print('schoolname:', name)
+            school_name = basic_data.get('name')
+            print('schoolname:', school_name)
             school_url = basic_data.get('school_url')
             price_calculator_url = basic_data.get('price_calculator_url')
 
@@ -173,20 +174,33 @@ def upload_college_file():
             # student_data = latest_data.get('student')
             # racial_makeup = student_data.get('demographics').get('race_ethnicity') #note this is a dictionary
 
-
-            print()
+            college = College(
+                name=school_name,
+                # description=form.description.data,
+                # early_deadline=form.early_deadline.data,
+                # regular_deadline=form.regular_deadline.data,
+                # scholarship_deadline=form.scholarship_deadline.data,
+                # fafsa_deadline=form.fafsa_deadline.data,
+                # acceptance_deadline=form.acceptance_deadline.data,
+                # image = form.image.data,school_url = "",
+                school_size = 0,
+                school_city = "",
+                tuition_in_state = 0,
+                tuition_out_of_state = 0,
+                cost_of_attendance_in_state = 0,
+                cost_of_attendance_out_of_state = 0,
+                room_and_board = 0,
+                sat_score_average_overall = 0,
+                act_score_average_overall = 0)
+            College.retrieve_college_info(college)
+            db.session.add(college)
 
 
 
 
 
             
-            
-
-
-                     
-        # stream = io.StringIO(f.stream.read().decode("UTF8"), newline=None)
-        # csv_input = csv.reader(stream)
+        
         # header_row = True
         # for row in csv_input:
         #     if header_row:
@@ -232,6 +246,8 @@ def upload_college_file():
         #         db.session.add(college)
         # db.session.commit()
         return redirect(url_for('counselor.colleges'))
+    else:
+        print('wasssuppppppp')
     return render_template('counselor/upload_colleges.html')
 
 

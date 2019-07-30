@@ -30,7 +30,7 @@ import datetime
 import csv
 import io
 
-# import pandas as pd
+import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 import urllib
@@ -119,9 +119,9 @@ def upload_college_file():
        
        #TODO: figure out how to update all of them (7059?)
         reader = pd.read_csv('https://ed-public-download.app.cloud.gov/downloads/Most-Recent-Cohorts-All-Data-Elements.csv',\
-                     chunksize=3000)
+                     chunksize=1000)
 
-        df = reader.get_chunk(3000)
+        df = reader.get_chunk(1000)
        
         for school_id in df['UINTID']:
             #API caps at 1000 requests per hour

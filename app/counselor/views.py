@@ -111,31 +111,36 @@ def colleges():
 @login_required
 @counselor_required
 def upload_college_file():
+    
+    # if not scorecard_key:
+    #     print('Add College Scorecard API Key')
+    #     return
 
-    scorecard_key = os.environ.get('COLLEGE_SCORECARD_KEY') or None
-
-    if not scorecard_key:
-        print('Add College Scorecard API Key')
-        return
-
-
+    #gets called when form is submitted
     if request.method == 'POST':
-       
+        scorecard_key = os.environ.get('COLLEGE_SCORECARD_KEY') or None
+
+        scorecard_key = 'mShrUMgo5TUfDgjVIPKRhvGWGrgelWSCWgKOA6az'
+
        #TODO: figure out how to update all of them (7059?)
         reader = pd.read_csv('https://ed-public-download.app.cloud.gov/downloads/Most-Recent-Cohorts-All-Data-Elements.csv',\
-                     chunksize=1000)
+                        chunksize=10)
 
-        df = reader.get_chunk(1000)
-       
-        for school_id in df['UINTID']:
+        df = reader.get_chunk(10)
+
+        for school_id in df['UNITID']:
             #API caps at 1000 requests per hour
-            request_data = requests.get('https://api.data.gov/ed/collegescorecard/v1/schools?id=' + school_id +\
-             '&api_key=' + scorecard_key)
+            request_data = requests.get('https://api.data.gov/ed/collegescorecard/v1/schools?id=' + str(school_id) +\
+                '&api_key=' + str(scorecard_key))
+
+            print('requesting data from', school_id)
+            
             latest_data = dict(request_data.json()).get('results')[0].get('latest')
             basic_data = dict(request_data.json()).get('results')[0].get('school')
 
             #basic data about the shcool
             name = basic_data.get('name')
+            print('schoolname:', name)
             school_url = basic_data.get('school_url')
             price_calculator_url = basic_data.get('price_calculator_url')
 
@@ -155,21 +160,21 @@ def upload_college_file():
 
             #school data
             school_costs = latest_data.get('cost')
-            private_costs = admission_data.get('cost').get('net_price').get('private') #TODO: parse these out so DB can read
-            public_costs = admission_data.get('cost').get('net_price').get('public')#TODO: parse these out 
+            # private_costs = admission_data.get('cost').get('net_price').get('private') #TODO: parse these out so DB can read
+            # public_costs = admission_data.get('cost').get('net_price').get('public')#TODO: parse these out 
 
 
 
             # school_population = school_costs.get('attendance').get('academic_year')
-    
+
             
 
             #student data
-            student_data = latest_data.get('student')
-            racial_makeup = student_data.get('demographics').get('race_ethnicity') #note this is a dictionary
+            # student_data = latest_data.get('student')
+            # racial_makeup = student_data.get('demographics').get('race_ethnicity') #note this is a dictionary
 
 
-
+            print()
 
 
 

@@ -13,7 +13,7 @@ from wtforms.fields.html5 import EmailField
 import re
 
 from .. import db
-from ..models import TestName, College
+from ..models import TestName, College, TestScore
 
 
 class EditCommonAppEssayForm(Form):
@@ -118,6 +118,16 @@ class AddTestScoreForm(Form):
         if not Form.validate(self):
             return False
         
+        # see if there's existing score in database with same test type, month, and year 
+        test_name = self.data.get('test_name').name
+        test_month = self.data.get('month')
+        test_year = self.data.get('year')
+
+        test = db.session.query(TestScore).filter_by(name=test_name, month=test_month, year=test_year).first()
+        if test is not None:
+            self.test_name.errors.append('Please enter a different date for this test or edit the existing score.')
+            return False
+        
         # TODO: Read me from a database or something... let admin be able to edit valid test score ranges
         valid_ranges = \
             {'ACT' : (0,36) ,
@@ -132,7 +142,7 @@ class AddTestScoreForm(Form):
             'SAT Subject Test - Chemistry' : (0, 800),
             'SAT Subject Test - Physics' : (0, 800)
             }
-        test_name = self.data.get('test_name').name
+        
         valid_range = valid_ranges.get(test_name, -1)
 
         # checking to see if the test name shows up in database; 

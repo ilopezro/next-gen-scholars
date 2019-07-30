@@ -1,11 +1,11 @@
 @media -sass-debug-info{filename{}line{font-family:\000037}}
 nav {
-  margin-bottom: 40px !important;
+  margin-bottom: 70px !important;
 }
 
 @media -sass-debug-info{filename{}line{font-family:\0000312}}
 .ui.fixed.main.menu .right.menu > .item:last-of-type {
-  border-right: 1px solid rgba(34, 36, 38, 0.09804);
+  border-right: 1px solid rgba(34, 36, 38, 0.0980392);
 }
 
 @media -sass-debug-info{filename{}line{font-family:\0000318}}
@@ -22,11 +22,4 @@ nav .mobile.only.row .ui.vertical.menu {
 @media -sass-debug-info{filename{}line{font-family:\0000330}}
 table.selectable tr:hover {
   cursor: pointer !important;
-}
-
-.goog-te-banner-frame.skiptranslate {
-    display: none !important;
-} 
-body {
-    top: 0px !important; 
 }

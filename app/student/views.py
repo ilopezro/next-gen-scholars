@@ -1,6 +1,6 @@
 import datetime
 from flask import (abort, flash, redirect, render_template, url_for, request,
-                   jsonify)
+                   jsonify, Flask)
 from flask_login import current_user, login_required
 from ..models import TestScore, RecommendationLetter, Interest, Essay, College, Major, StudentProfile, ScattergramData, Acceptance, StudentScholarship
 from .. import db, csrf
@@ -27,6 +27,9 @@ os.environ[
     'OAUTHLIB_INSECURE_TRANSPORT'] = '1'  # TODO: remove before production?
 
 import random #for fake college interest
+import logging 
+
+app = Flask(__name__)
 
 #load student profile, test scores for profile and comparer
 def load_student_profile(current_user):
@@ -817,6 +820,13 @@ def compare_checklist_items(item):
 @login_required
 def checklist(student_profile_id):
     # only allows the student or counselors/admins to see a student's profile
+    users = User.query.filter_by(role_id=1)
+    for user in users:
+        checklist_items = ChecklistItem.query.filter_by(assignee_id=user.student_profile_id)
+        checklist_items = [item for item in checklist_items if not item.is_checked]
+        app.logger.error('student')
+        app.logger.error(checklist_items)
+    
     if student_profile_id == current_user.student_profile_id or current_user.role_id != 1:
         checklist_items = ChecklistItem.query.filter_by(
             assignee_id=student_profile_id)
@@ -825,6 +835,8 @@ def checklist(student_profile_id):
         checklist_items = [
             item for item in checklist_items if not item.is_checked
         ]
+        app.logger.error('after')
+        app.logger.error(checklist_items)
         checklist_items.sort(key=compare_checklist_items)
         #### form to add checklist item ###
         form = AddChecklistItemForm()

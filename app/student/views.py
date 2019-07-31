@@ -547,14 +547,6 @@ def add_college(student_profile_id):
         student_profile_id=student_profile_id)
 
 
-@student.route('/colleges')
-@login_required
-def colleges():
-    """View all colleges."""
-    colleges = College.query.all()
-    return render_template('student/colleges.html', colleges=colleges)
-
-
 @student.route('/resources')
 @login_required
 def resources():
@@ -562,6 +554,14 @@ def resources():
     resources = Resource.query.all()
     editable_html_obj = EditableHTML.get_editable_html('resources')
     return render_template('counselor/resources.html', resources=resources, editable_html_obj=editable_html_obj)
+    
+
+@student.route('/colleges')
+@login_required
+def colleges():
+    """View all colleges."""
+    colleges = College.query.all()
+    return render_template('student/colleges.html', colleges=colleges)
 
 
 @student.route(

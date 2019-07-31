@@ -4,7 +4,7 @@ import pytz
 from flask import abort, flash, redirect, render_template, url_for, request, jsonify, Flask
 from flask_login import current_user, login_required
 from flask_rq import get_queue
-from .. import csrf
+from .. import db, csrf
 from .forms import (ChangeAccountTypeForm, ChangeUserEmailForm, InviteUserForm,
                     NewUserForm, AddChecklistItemForm, AddTestNameForm,
                     EditTestNameForm, DeleteTestNameForm,
@@ -14,7 +14,6 @@ from .forms import (ChangeAccountTypeForm, ChangeUserEmailForm, InviteUserForm,
                     AddScholarshipProfileForm, EditScholarshipProfileStep1Form,
                     EditScholarshipProfileStep2Form, DeleteScholarshipProfileForm)
 from . import counselor
-from .. import db
 from ..decorators import counselor_required
 from ..decorators import admin_required
 from ..email import send_email
@@ -494,8 +493,21 @@ def resources():
     """View all Resources."""
     resources = Resource.query.all()
     editable_html_obj = EditableHTML.get_editable_html('resources')
-
     return render_template('counselor/resources.html', resources=resources, editable_html_obj=editable_html_obj)
+
+@login_required
+@counselor.route(
+    '/resources/delete/<int:item_id>', methods=['GET', 'POST'])
+@csrf.exempt
+def delete_test_score(item_id):
+    resource = Resource.query.filter_by(id=item_id).first()
+    if resource:
+        # only allows the student or counselors/admins to perform action
+        if current_user.role_id >= 2:
+            db.session.delete(resource)
+            db.session.commit()
+            return jsonify({"success": "True"})
+    return jsonify({"success": "False"})
 
 
 @counselor.route('/edit_test', methods=['GET', 'POST'])

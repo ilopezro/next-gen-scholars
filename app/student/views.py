@@ -23,13 +23,19 @@ import requests
 import os
 import datetime
 from datetime import date
+from werkzeug.utils import secure_filename
+
 os.environ[
     'OAUTHLIB_INSECURE_TRANSPORT'] = '1'  # TODO: remove before production?
 
 import random #for fake college interest
 import logging 
 
+UPLOAD_FOLDER='../../../secure'
+ALLOWED_EXTENSIONS = {'pdf'}
+
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 #load student profile, test scores for profile and comparer
 def load_student_profile(current_user):
@@ -1242,6 +1248,10 @@ def delete_student_scholarship(item_id):
 
 # transcript methods
 
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 @student.route(
     '/profile/add_transcript/<int:student_profile_id>',
     methods=['GET', 'POST'])
@@ -1254,14 +1264,28 @@ def add_transcript(student_profile_id):
     form = AddTranscriptForm()
     if form.validate_on_submit():
         # create new essay from form data
+        f = form.transcript.data
+        filename = secure_filename(f.filename)
+        f.save(os.path.going(app.config['UPLOAD_FOLDER'], filename))
+        
         new_item = Transcript(
             student_profile_id=student_profile_id,
-            file_id=form.file_id.data,
-            file_name=form.file_name.data,
-            file_path=form.file_path.data)
+            file_name=filename)
         db.session.add(new_item)
         db.session.commit()
+        
         url = get_redirect_url(student_profile_id)
+
+        # if request.method == 'POST':
+        #     if 'file' not in request.files:
+        #         flash('No file part')
+        #         return redirect(url)
+        # file = request.files['file']
+        # if file and allowed_file(file.filename):
+        #     filename = secure_filename(file.filename)
+        #     file.save(os.path.going(app.config['UPLOAD_FOLDER'], filename))
+        #     return redirect(url_for('uploaded_file', file_name=filename))
+
         return redirect(url)
 
     return render_template(

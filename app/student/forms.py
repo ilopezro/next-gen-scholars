@@ -6,7 +6,7 @@ from wtforms import ValidationError
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import (PasswordField, StringField, SubmitField,
                             IntegerField, FloatField, SelectField,
-                            BooleanField)
+                            BooleanField, FileField)
 from wtforms.fields.html5 import EmailField, DateField
 from wtforms.validators import Email, EqualTo, InputRequired, Length, Optional, NumberRange
 from wtforms.fields.html5 import EmailField
@@ -15,6 +15,7 @@ import re
 from .. import db
 from ..models import TestName, College, TestScore
 
+from werkzeug.utils import secure_filename
 
 class EditCommonAppEssayForm(Form):
     link = StringField(
@@ -329,7 +330,8 @@ class EditStudentScholarshipForm(Form):
             raise ValidationError('Monetary amount must be in the format: xx, xx.xx or xx.xx')
 
 class AddTranscriptForm(Form):
-    file_id = StringField('File ID', validators=[InputRequired()])
-    file_name = StringField('File Name', validators=[InputRequired()])
-    file_path = StringField('File Path', validators=[InputRequired()])
+    transcript = FileField()
+    # file_id = StringField('File ID', validators=[InputRequired()])
+    # file_name = StringField('File Name', validators=[InputRequired()])
+    # file_path = StringField('File Path', validators=[InputRequired()])
     submit = SubmitField('Add Transcript')

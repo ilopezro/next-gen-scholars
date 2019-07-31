@@ -5,7 +5,9 @@
 <div class="ui stackable grid centered container" style="margin-top:12px; margin-bottom:14px">
     <div class="twelve wide computer sixteen wide mobile column">
         <div class="row">
-            <h1 class="ui dividing header">Resources</h1>
+			<h1 class="ui dividing header">Resources</h1>
+			{{ page.render_inline_editor(editable_html_obj, current_user) }}
+
         </div>
     </div>
 </div> 

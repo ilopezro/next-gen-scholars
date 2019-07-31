@@ -14,7 +14,7 @@ from .forms import (
     AddAcceptanceForm, EditAcceptanceForm, AddStudentScholarshipForm, EditStudentScholarshipForm, AddTranscriptForm)
 from ..models import (User, College, Essay, TestScore, ChecklistItem,
                       RecommendationLetter, TestName, Notification,
-                      Acceptance, Scholarship)
+                      Acceptance, Scholarship, Transcript)
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
@@ -31,7 +31,7 @@ os.environ[
 import random #for fake college interest
 import logging 
 
-UPLOAD_FOLDER='../../../secure'
+UPLOAD_FOLDER='secure'
 ALLOWED_EXTENSIONS = {'pdf'}
 
 app = Flask(__name__)
@@ -1266,7 +1266,7 @@ def add_transcript(student_profile_id):
         # create new essay from form data
         f = form.transcript.data
         filename = secure_filename(f.filename)
-        f.save(os.path.going(app.config['UPLOAD_FOLDER'], filename))
+        f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         
         new_item = Transcript(
             student_profile_id=student_profile_id,

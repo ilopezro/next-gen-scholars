@@ -2,7 +2,7 @@ import datetime
 from flask import (abort, flash, redirect, render_template, url_for, request,
                    jsonify, Flask)
 from flask_login import current_user, login_required
-from ..models import TestScore, RecommendationLetter, Interest, Essay, College, Major, StudentProfile, ScattergramData, Acceptance, StudentScholarship
+from ..models import TestScore, RecommendationLetter, Interest, Essay, College, Major, Resource, StudentProfile, ScattergramData, Acceptance, StudentScholarship
 from .. import db, csrf
 from . import student
 from .forms import (

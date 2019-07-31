@@ -493,7 +493,9 @@ def add_test_name():
 def resources():
     """View all Resources."""
     resources = Resource.query.all()
-    return render_template('student/resources.html', colleges=colleges)
+    editable_html_obj = EditableHTML.get_editable_html('resources')
+
+    return render_template('counselor/resources.html', resources=resources, editable_html_obj=editable_html_obj)
 
 
 @counselor.route('/edit_test', methods=['GET', 'POST'])

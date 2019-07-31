@@ -15,7 +15,6 @@
 	        <div class="image">
 	            <img src="{{ imageSource }}">
 	        </div>
-
 	        <div class="middle aligned content">
 	            <a class="header" href="{{url}}"> {{ title }}</a>
 	            {% if description is not none %}
@@ -29,16 +28,11 @@
 
 <div class="ui three column stackable centered grid" style="padding-bottom: 100px;">
     <div class="ui items">
-        {{ resource_m('Writing a Personal Essay','https://www.princetonreview.com/college-advice/college-essay', 'https://clipartstation.com/wp-content/uploads/2018/09/essay-clipart-4.jpg') }}
-        {{ resource_m('Completing the FAFSA', 'https://www.youtube.com/watch?time_continue=3&v=LK0bbu0y5AM', 'https://moneydotcomvip.files.wordpress.com/2017/03/170310_fafsa.jpg') }}
-        {{ resource_m('Interviews', 'https://www.collegeessayguy.com/blog/college-interview', 'http://images.clipartpanda.com/interview-clipart-Interview.png') }}
-        {{ resource_m('Choosing the Right Schools', 'https://bigfuture.collegeboard.org/find-colleges/how-find-your-college-fit', 'http://www.cnf.cornell.edu/image/cornell_fall_sunset.jpg') }}
+		{% for r in resources | sort(attribute='title') %}
+			 {{ resource_m(r.title, r.resource_url, r.image_url, r.description) }}
+		{% endfor %}  
     </div>
 </div>
-
-
-
-
 
 <script src="{{ url_for('static', filename='ckeditor/ckeditor.js') }}"></script>
 {% endblock %}

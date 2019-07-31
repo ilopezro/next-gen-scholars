@@ -3,7 +3,6 @@ from flask_login import login_required
 from ..models import EditableHTML
 from . import main
 
-
 @main.route('/')
 def index():
     editable_html_obj = EditableHTML.get_editable_html('index')

@@ -554,7 +554,7 @@ def colleges():
 def resources():
     """View all Resources."""
     resources = Resource.query.all()
-    return render_template('counselor/resources.html', colleges=colleges)
+    return render_template('student/resources.html', resources=resources)
 
 
 @student.route(

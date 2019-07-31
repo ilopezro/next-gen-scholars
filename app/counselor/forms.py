@@ -191,6 +191,22 @@ class EditCollegeProfileStep1Form(Form):
     submit = SubmitField('Continue')
 
 
+class AddResourceForm(Form):
+    url = StringField(
+        'Link to Resource',
+        validators = InputRequired()
+    )
+    resource_name = StringField(u'Resource Name', 
+        validators= InputRequired(),
+        widget=TextArea()
+    )
+    image_url = StringField(
+        'URL of Resource Image',
+        validators = InputRequired()
+    )
+    submit = SubmitField('Add Resource')
+
+
 class EditCollegeProfileStep2Form(Form):
     name = StringField(
         'College/University Name',

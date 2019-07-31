@@ -483,10 +483,30 @@ def add_test_name():
             db.session.add(test)
             db.session.commit()
         else:
-            flash('Test could not be added - already existed in database.',
+            flash('Test could not be added - test already exists in the database.',
                   'error')
         return redirect(url_for('counselor.index'))
     return render_template('counselor/add_test_name.html', form=form)
+
+
+@counselor.route('/add_resource', methods=['GET', 'POST'])
+@login_required
+@counselor_required
+def add_resource():
+    # Allows a counselor to add a test name to the database.
+    form = AddTestNameForm()
+    if form.validate_on_submit():
+        test_name = TestName.query.filter_by(name=form.name.data).first()
+        if test_name is None:
+            # Test didn't already exist in database, so add it.
+            test = TestName(name=form.name.data)
+            db.session.add(test)
+            db.session.commit()
+        else:
+            flash('Resource could not be added - resource already exists in the database.',
+                  'error')
+        return redirect(url_for('counselor.resource'))
+    return render_template('counselor/add_resource.html', form=form)
 
 
 @counselor.route('/edit_test', methods=['GET', 'POST'])

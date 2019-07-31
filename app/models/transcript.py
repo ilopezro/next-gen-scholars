@@ -9,7 +9,6 @@ class Transcript(db.Model):
     id = db.Column(db.Integer, unique=True, primary_key=True)
     file_id = db.Column(db.String, unique=True, nullable=True)
     student_profile_id = db.Column(db.Integer, db.ForeignKey('student_profile.id'),index=True)
-    doc_class_id = db.Column(db.Strig, db.ForeignKey("document_class.id", nullable=False))
     file_name = db.Column(db.String, unique=False, nullable=True)
     file_path = db.Column(db.String, unique=False, nullable=True)
 

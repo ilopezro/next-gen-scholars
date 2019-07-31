@@ -11,7 +11,7 @@ from .forms import (
     EditCommonAppEssayForm, AddChecklistItemForm, EditChecklistItemForm,
     EditStudentProfile, AddMajorForm, AddCollegeForm,
     EditRecommendationLetterForm, AddCommonAppEssayForm,
-    AddAcceptanceForm, EditAcceptanceForm, AddStudentScholarshipForm, EditStudentScholarshipForm)
+    AddAcceptanceForm, EditAcceptanceForm, AddStudentScholarshipForm, EditStudentScholarshipForm, AddTranscriptForm)
 from ..models import (User, College, Essay, TestScore, ChecklistItem,
                       RecommendationLetter, TestName, Notification,
                       Acceptance, Scholarship)
@@ -1238,3 +1238,80 @@ def delete_student_scholarship(item_id):
             db.session.commit()
             return jsonify({"success": "True"})
     return jsonify({"success": "False"})
+
+
+# transcript methods
+
+@student.route(
+    '/profile/add_transcript/<int:student_profile_id>',
+    methods=['GET', 'POST'])
+@login_required
+def add_transcript(student_profile_id):
+    # only allows the student or counselors/admins to access page
+    if student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
+        abort(404)
+
+    form = AddTranscriptForm()
+    if form.validate_on_submit():
+        # create new essay from form data
+        new_item = Transcript(
+            student_profile_id=student_profile_id,
+            file_id=form.file_id.data,
+            file_name=form.file_name.data,
+            file_path=form.file_path.data)
+        db.session.add(new_item)
+        db.session.commit()
+        url = get_redirect_url(student_profile_id)
+        return redirect(url)
+
+    return render_template(
+        'student/add_academic_info.html',
+        form=form,
+        header="Add Transcript",
+        student_profile_id=student_profile_id)
+
+
+# @student.route(
+#     '/profile/transcript/edit/<int:item_id>', methods=['GET', 'POST'])
+# @login_required
+# def edit_transcript(item_id):
+#     transcript = Transcript.query.filter_by(id=item_id).first()
+#     if transcript:
+#         # only allows the student or counselors/admins to access page
+#         if transcript.student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
+#             abort(404)
+#         form = EditTranscript(
+#             file_id=transcript.file_id.data,
+#             file_name=transcript.file_name.data,
+#             file_path=transcript.file_path.data)
+#         if form.validate_on_submit():
+#             essay.name = form.essay_name.data
+#             essay.link = form.link.data
+#             essay.status = form.status.data
+#             db.session.add(essay)
+#             db.session.commit()
+#             url = get_redirect_url(essay.student_profile_id)
+#             return redirect(url)
+#         return render_template(
+#             'student/edit_academic_info.html',
+#             form=form,
+#             header="Edit Supplemental Essay",
+#             student_profile_id=essay.student_profile_id)
+#     abort(404)
+
+
+# @student.route(
+#     '/profile/supplemental_essay/delete/<int:item_id>',
+#     methods=['GET', 'POST'])
+# @login_required
+# @csrf.exempt
+# def delete_supplemental_essay(item_id):
+#     essay = Essay.query.filter_by(id=item_id).first()
+#     if essay:
+#         # only allows the student or counselors/admins to perform action
+#         if essay.student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
+#             return jsonify({"success": "False"})
+#         db.session.delete(essay)
+#         db.session.commit()
+#         return jsonify({"success": "True"})
+#     return jsonify({"success": "False"})

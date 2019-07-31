@@ -327,3 +327,9 @@ class EditStudentScholarshipForm(Form):
         award_amount = str(field.data)
         if re.match('^\d+(\.\d(\d)?)?$', award_amount) is None:
             raise ValidationError('Monetary amount must be in the format: xx, xx.xx or xx.xx')
+
+class AddTranscriptForm(Form):
+    file_id = StringField('File ID', validators=[InputRequired()])
+    file_name = StringField('File Name', validators=[InputRequired()])
+    file_path = StringField('File Path', validators=[InputRequired()])
+    submit = SubmitField('Add Transcript')

@@ -86,12 +86,13 @@
   <div class="row">
     <div class="twelve wide column">
       <div style="color: #1A85D6;" class="ui horizontal divider">
-        <h3>Transcript</h3>
+        Transcript
       </div>
     </div>
     <div class="nine wide column">
-      <a class="ui blue basic icon button" href="/student/profile/test_score/edit/{{ test.id }}"><i class="ui edit icon"></i></a>
-      <div class="ui red basic icon button delete-test-button" data-id="{{ test.id }}"><i class="ui remove icon"></i></div>
+      <a class="ui right floated small green basic labeled icon button" href="{{ url_for('student.add_transcript', student_profile_id=user.student_profile.id)}}">
+        <i class="plus icon"></i> Add Transcript
+      </a>
     </div>
   </div>
 

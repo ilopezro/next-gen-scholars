@@ -48,6 +48,7 @@ def load_student_profile(current_user):
 
     return student_profile, sat, act
 
+
 @student.route('/profile')
 @login_required
 def view_user_profile():
@@ -66,6 +67,8 @@ def view_user_profile():
 def load_comparer_data_col():
     colleges = (current_user.student_profile.colleges)
     return colleges
+
+
 @student.route('/comparer')
 @login_required
 def comparer():
@@ -84,6 +87,7 @@ def comparer():
     return render_template('student/college_comparer.html', user=current_user, 
         act=act, sat=sat, 
         colleges=colleges, authenticated=True)
+
 
 @student.route('/profile_from_id/<int:student_profile_id>')
 def get_profile_from_id(student_profile_id):

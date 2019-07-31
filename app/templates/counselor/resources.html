@@ -12,8 +12,8 @@
     </div>
 </div> 
 
-{% macro resource_m(title, url=none, imageSource="none", description=none) %}
-	    <div class="item">
+{% macro resource_m(id, title, url=none, imageSource="none", description=none) %}
+	    <div class="item" data-id="{{ id }}">
 	        <div class="image">
 	            <img src="{{ imageSource }}">
 	        </div>
@@ -23,18 +23,43 @@
 	                <div class="description">
 	                    <p> {{ description }}</p>
 	                </div>
-	            {% endif %}
-	        </div>
+				{% endif %}
+			</div>
+			<div class="ui red basic icon button delete-resource-button"><i class="ui remove icon"></i></div>
+
 	    </div>
 	{% endmacro %}
 
 <div class="ui three column stackable centered grid" style="padding-bottom: 100px;">
     <div class="ui items">
 		{% for r in resources | sort(attribute='title') %}
-			 {{ resource_m(r.title, r.resource_url, r.image_url, r.description) }}
+			 {{ resource_m(r.id, r.title, r.resource_url, r.image_url, r.description) }}
 		{% endfor %}  
     </div>
 </div>
 
 <script src="{{ url_for('static', filename='ckeditor/ckeditor.js') }}"></script>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+	  // Delete resource 
+	  $('.delete-resource-button').click(function() {
+		var url = '/student/profile/test_score/delete/' + $(this).data('id');
+		$(this).parent().parent().parent().remove();
+		$.ajax({
+		  url: url,
+		  type: 'POST',
+		  success: function(data) {
+			if (data.success !== "True") {
+			  alert("Sorry there was an error, please try again.");
+			}
+		  }
+		});
+	  });
+	}
+	
+  </script>
+
+
+
 {% endblock %}

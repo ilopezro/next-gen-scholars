@@ -18,9 +18,9 @@ from .. import db
 from ..decorators import counselor_required
 from ..decorators import admin_required
 from ..email import send_email
-from ..models import (Role, User, College, StudentProfile, EditableHTML,
+from ..models import (Role, User, College, StudentProfile, EditableHTML, 
                       ChecklistItem, TestName, College, Notification, SMSAlert,
-                      ScattergramData, Acceptance, Scholarship)
+                      ScattergramData, Acceptance, Scholarship, Resource)
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
@@ -487,6 +487,13 @@ def add_test_name():
                   'error')
         return redirect(url_for('counselor.index'))
     return render_template('counselor/add_test_name.html', form=form)
+
+@counselor.route('/resources')
+@login_required
+def resources():
+    """View all Resources."""
+    resources = Resource.query.all()
+    return render_template('student/resources.html', colleges=colleges)
 
 
 @counselor.route('/edit_test', methods=['GET', 'POST'])

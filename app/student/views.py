@@ -549,6 +549,14 @@ def colleges():
     return render_template('student/colleges.html', colleges=colleges)
 
 
+@student.route('/resources')
+@login_required
+def resources():
+    """View all Resources."""
+    resources = Resource.query.all()
+    return render_template('counselor/resources.html', colleges=colleges)
+
+
 @student.route(
     '/profile/college/delete/<int:item_id>/<int:student_profile_id>',
     methods=['POST'])

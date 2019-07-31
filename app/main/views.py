@@ -11,24 +11,15 @@ def index():
         'main/index.html', editable_html_obj=editable_html_obj, pageType='home')
     return render_template('main/index.html', pageType='home')
 
-
 @main.route('/about')
 def about():
     editable_html_obj = EditableHTML.get_editable_html('about')
     return render_template(
         'main/about.html', editable_html_obj=editable_html_obj)
 
-@main.route('/resources')
-@login_required
-def resources():
-    editable_html_obj = EditableHTML.get_editable_html('resources')
-    return render_template(
-    'main/resources.html', editable_html_obj=editable_html_obj, pageType='resources')
-
 @main.route('/calendar', methods=['GET', 'POST'])
 def calendar():
     return render_template('main/calendar.html')
-
 
 @main.route('/scattergram', methods=['GET', 'POST'])
 @login_required

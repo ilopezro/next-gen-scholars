@@ -38,7 +38,7 @@
           ('student.colleges', 'Colleges', 'university'),
           ('student.scholarships', 'Scholarships', 'money bill alternate outline icon'),
 
-          ('main.resources', 'Resources', 'file text outline')
+          ('student.resources', 'Resources', 'file text outline')
         ] %}
       {% elif current_user.is_counselor() %}
         {% set endpoints = [
@@ -47,7 +47,7 @@
           ('main.calendar', 'Calendar', 'calendar'),
           ('counselor.colleges', 'Colleges', 'university'),
           ('counselor.scholarships', 'Scholarships', 'money bill alternate outline icon'),
-          ('main.resources', 'Resources', 'file text outline')
+          ('counselor.resources', 'Resources', 'file text outline')
         ] %}
       {% else %}
         {% set endpoints = [
@@ -56,7 +56,7 @@
           ('main.calendar', 'Calendar', 'calendar'),
           ('counselor.colleges', 'Colleges', 'university'),
           ('counselor.scholarships', 'Scholarships', 'money bill alternate outline icon'),          
-          ('main.resources', 'Resources', 'file text outline')
+          ('counselor.resources', 'Resources', 'file text outline')
         ] %}
       {% endif %}
     {% endif %}

@@ -1268,11 +1268,16 @@ def add_transcript(student_profile_id):
         filename = secure_filename(f.filename)
         f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         
+        app.logger.error(student_profile_id)
+        app.logger.error(filename)
+
         new_item = Transcript(
             student_profile_id=student_profile_id,
             file_name=filename)
         db.session.add(new_item)
         db.session.commit()
+
+        app.logger.error('finished adding to db')
         
         url = get_redirect_url(student_profile_id)
 

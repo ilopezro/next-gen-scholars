@@ -1,5 +1,6 @@
 from .. import db
 from sqlalchemy.orm import validates
+from faker import Faker
 
 
 class Transcript(db.Model):
@@ -16,9 +17,15 @@ class Transcript(db.Model):
     # def validate_status(self, key, status):
     #     return status
 
-    # @staticmethod
-    # def generate_fake(count=2):
-    #     return essays
+    @staticmethod
+    def generate_fake():
+        fake = Faker()
+        transcript_item = Transcript(student_profile_id='1',file_name='00_Course_Info.pdf')
+        transcript_items = []
+        transcript_items.append(transcript_item)
+        # db.session.add(transcript_item)
+        # db.session.commit()
+        return transcript_items
 
     def __repr__(self):
         return '<Transcript {}, {}, {}>'.format(self.file_id, self.student_profile_id, 

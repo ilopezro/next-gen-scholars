@@ -553,7 +553,7 @@ def resources():
     """View all Resources."""
     resources = Resource.query.all()
     editable_html_obj = EditableHTML.get_editable_html('resources')
-    return render_template('counselor/resources.html', resources=resources, editable_html_obj=editable_html_obj)
+    return render_template('student/resources.html', resources=resources, editable_html_obj=editable_html_obj)
     
 
 @student.route('/colleges')

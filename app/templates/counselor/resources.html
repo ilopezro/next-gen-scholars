@@ -7,7 +7,6 @@
         <div class="row">
 			<h1 class="ui dividing header">Resources</h1>
 			{{ page.render_inline_editor(editable_html_obj, current_user) }}
-
         </div>
     </div>
 </div> 
@@ -26,12 +25,13 @@
 	                </div>
 				{% endif %}
 			</div>
-			<a class="ui blue basic icon button" href="/counselor/resources/edit_resource/{{ id }}"><i class="ui edit icon"></i></a>
+			<a class="ui blue basic icon button" href="/counselor/resources/edit/{{ id }}"><i class="ui edit icon"></i></a>
 			<div class="ui red basic icon button delete-resource-button" data-id="{{ id }}"><i class="ui remove icon"></i></div>
 
 	    </div>
 	{% endmacro %}
 
+<a class="ui blue basic icon button" href="/counselor/add_resource"><i class="ui add icon"></i></a>
 <div class="ui three column stackable centered grid" style="padding-bottom: 100px;">
     <div class="ui items">
 		{% for r in resources | sort(attribute='title') %}

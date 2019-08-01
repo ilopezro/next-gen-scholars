@@ -12,7 +12,7 @@ from .forms import (ChangeAccountTypeForm, ChangeUserEmailForm, InviteUserForm,
                     EditCollegeProfileStep2Form, DeleteCollegeProfileForm,
                     NewSMSAlertForm, EditSMSAlertForm, ParseAwardLetterForm,
                     AddScholarshipProfileForm, EditScholarshipProfileStep1Form,
-                    EditScholarshipProfileStep2Form,EditResourceForm,
+                    EditScholarshipProfileStep2Form,EditResourceForm, AddResourceForm,
                     DeleteScholarshipProfileForm)
 from . import counselor
 from ..decorators import counselor_required
@@ -513,7 +513,7 @@ def delete_resource(item_id):
 
 @login_required
 @counselor.route(
-    '/resources/edit_resource/<int:item_id>', methods=['GET', 'POST'])
+    '/resources/edit/<int:item_id>', methods=['GET', 'POST'])
 @csrf.exempt
 def edit_resource(item_id):
     resource = Resource.query.filter_by(id=item_id).first()
@@ -538,6 +538,30 @@ def edit_resource(item_id):
     return render_template('counselor/edit_resource.html', form=form, 
         resource=resource, header='Edit Resource')
 
+@counselor.route('/add_resource', methods=['GET', 'POST'])
+@login_required
+@counselor_required
+def add_resource():
+    # Allows a counselor to add a college profile.
+    form = AddResourceForm()
+    if form.validate_on_submit():
+        resource_url = Resource.query.filter_by(resource_url=form.resource_url.data).first()
+        if resource_url is None:
+            # College didn't already exist in database, so add it.
+            resource = Resource(
+                resource_url=form.resource_url.data,
+                title=form.title.data,
+                description=form.description.data,
+                image_url=form.image_url.data
+            )
+            db.session.add(resource)
+        else:
+            flash('Resource could not be added - already exists in database.',
+                  'error')
+        return redirect(url_for('counselor.resources'))
+    db.session.commit()
+    return render_template(
+        'counselor/add_resource.html', form=form, header='Add Resource')
 
 @counselor.route('/edit_test', methods=['GET', 'POST'])
 @login_required

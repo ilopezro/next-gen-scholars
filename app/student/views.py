@@ -14,7 +14,7 @@ from .forms import (
     AddAcceptanceForm, EditAcceptanceForm, AddStudentScholarshipForm, EditStudentScholarshipForm, AddTranscriptForm)
 from ..models import (User, College, Essay, TestScore, ChecklistItem,
                       RecommendationLetter, TestName, Notification,
-                      Acceptance, Scholarship, Transcript)
+                      Acceptance, Scholarship)
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
@@ -23,19 +23,13 @@ import requests
 import os
 import datetime
 from datetime import date
-from werkzeug.utils import secure_filename
-
 os.environ[
     'OAUTHLIB_INSECURE_TRANSPORT'] = '1'  # TODO: remove before production?
 
 import random #for fake college interest
 import logging 
 
-UPLOAD_FOLDER='secure'
-ALLOWED_EXTENSIONS = {'pdf'}
-
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 #load student profile, test scores for profile and comparer
 def load_student_profile(current_user):
@@ -1245,7 +1239,6 @@ def delete_student_scholarship(item_id):
             return jsonify({"success": "True"})
     return jsonify({"success": "False"})
 
-
 # transcript methods
 
 def allowed_file(filename):
@@ -1289,7 +1282,7 @@ def add_transcript(student_profile_id):
         return redirect(url)
 
     return render_template(
-        'student/student_profile.html',
+        'student/add_academic_info.html',
         form=form,
         header="Add Transcript",
         student_profile_id=student_profile_id)

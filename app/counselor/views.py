@@ -20,7 +20,7 @@ from ..decorators import admin_required
 from ..email import send_email
 from ..models import (Role, User, College, StudentProfile, EditableHTML,
                       ChecklistItem, TestName, College, Notification, SMSAlert,
-                      ScattergramData, Acceptance, Scholarship)
+                      ScattergramData, Acceptance, Scholarship, Transcript)
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery

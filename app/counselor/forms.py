@@ -197,7 +197,7 @@ class AddResourceForm(Form):
         validators = InputRequired()
     )
     title = StringField(u'Resource Title', 
-        validators= InputRequired(),
+        validators= InputRequired()
     )
     description = StringField(u'Resource Description', 
         validators= InputRequired(),
@@ -211,15 +211,23 @@ class AddResourceForm(Form):
 
 
 class EditResourceForm(Form):
-    old_test = QuerySelectField(
-        'Select test you wish to edit',
+    resource_url = StringField(
+        u'Link to Resource',
+        validators=[InputRequired()]
+    )
+    title = StringField(
+        u'Resource Title',
+        validators=[InputRequired()]
+    )
+    description = StringField(u'Resource Description', 
         validators=[InputRequired()],
-        get_label='name',
-        query_factory=lambda: db.session.query(TestName).order_by('name'))
-    new_name = StringField(
-        'New Test Name', validators=[InputRequired(),
-                                     Length(1, 150)])
-    submit = SubmitField('Edit Test Name')
+        widget=TextArea()
+    )
+    image_url = StringField(
+        u'URL of Resource Image',
+        validators=[InputRequired()]
+    )
+    submit = SubmitField('Edit Resource')
 
 
 class EditCollegeProfileStep2Form(Form):

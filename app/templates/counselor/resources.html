@@ -12,6 +12,7 @@
     </div>
 </div> 
 
+
 {% macro resource_m(id, title, url=none, imageSource="none", description=none) %}
 	    <div class="item">
 	        <div class="image">
@@ -25,6 +26,7 @@
 	                </div>
 				{% endif %}
 			</div>
+			<a class="ui blue basic icon button" href="/counselor/resources/edit_resource/{{ id }}"><i class="ui edit icon"></i></a>
 			<div class="ui red basic icon button delete-resource-button" data-id="{{ id }}"><i class="ui remove icon"></i></div>
 
 	    </div>
@@ -44,10 +46,8 @@
 	$(document).ready(function() {
 	  // Delete resource 
 	  $('.delete-resource-button').click(function() {
-		console.log($(this).data('id'));
 		var url = '/counselor/resources/delete/' + $(this).data('id');
 		$(this).parent().remove();
-		console.log(url);
 		$.ajax({
 		  url: url,
 		  type: 'GET',

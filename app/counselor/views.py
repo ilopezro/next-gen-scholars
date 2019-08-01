@@ -12,7 +12,8 @@ from .forms import (ChangeAccountTypeForm, ChangeUserEmailForm, InviteUserForm,
                     EditCollegeProfileStep2Form, DeleteCollegeProfileForm,
                     NewSMSAlertForm, EditSMSAlertForm, ParseAwardLetterForm,
                     AddScholarshipProfileForm, EditScholarshipProfileStep1Form,
-                    EditScholarshipProfileStep2Form, DeleteScholarshipProfileForm)
+                    EditScholarshipProfileStep2Form,EditResourceForm,
+                    DeleteScholarshipProfileForm)
 from . import counselor
 from ..decorators import counselor_required
 from ..decorators import admin_required
@@ -499,15 +500,43 @@ def resources():
 @counselor.route(
     '/resources/delete/<int:item_id>', methods=['GET', 'POST'])
 @csrf.exempt
-def delete_test_score(item_id):
+def delete_resource(item_id):
     resource = Resource.query.filter_by(id=item_id).first()
     if resource:
-        # only allows the student or counselors/admins to perform action
+        # only allows the counselors/admins to perform action
         if current_user.role_id >= 2:
             db.session.delete(resource)
             db.session.commit()
             return jsonify({"success": "True"})
     return jsonify({"success": "False"})
+
+
+@login_required
+@counselor.route(
+    '/resources/edit_resource/<int:item_id>', methods=['GET', 'POST'])
+@csrf.exempt
+def edit_resource(item_id):
+    resource = Resource.query.filter_by(id=item_id).first()
+    form = EditResourceForm(
+        url=resource.resource_url,
+        title=resource.title,
+        description=resource.description,
+        image_url=resource.image_url
+    )    
+    if not resource:
+        abort(404)
+    if form.validate_on_submit():
+        resource_new = resource
+        resource_new.resource_url = form.resource_url.data
+        resource_new.title = form.title.data
+        resource_new.description = form.description.data
+        resource_new.image_url = form.image_url.data
+        db.session.add(resource_new)
+        db.session.commit()
+        flash('Resource successfully edited.', 'form-success')
+        return redirect(url_for('counselor.resources'))
+    return render_template('counselor/edit_resource.html', form=form, 
+        resource=resource, header='Edit Resource')
 
 
 @counselor.route('/edit_test', methods=['GET', 'POST'])
@@ -543,7 +572,6 @@ def delete_test_name():
         'counselor/delete_test_name.html',
         form=form,
         header='Delete Test Name')
-
 
 @counselor.route('/add_college', methods=['GET', 'POST'])
 @login_required
@@ -585,20 +613,20 @@ def add_college():
         'counselor/add_college.html', form=form, header='Add College Profile')
 
 
-@counselor.route('/edit_college', methods=['GET', 'POST'])
-@login_required
-@counselor_required
-def edit_college_step1():
-    # Allows a counselor to choose which college they want to edit.
-    form = EditCollegeProfileStep1Form()
-    if form.validate_on_submit():
-        college = College.query.filter_by(name=form.name.data.name).first()
-        return redirect(
-            url_for('counselor.edit_college_step2', college_id=college.id))
-    return render_template(
-        'counselor/edit_college.html',
-        form=form,
-        header='Edit College Profile')
+# @counselor.route('/edit_college', methods=['GET', 'POST'])
+# @login_required
+# @counselor_required
+# def edit_college_step1():
+#     # Allows a counselor to choose which college they want to edit.
+#     form = EditCollegeProfileStep1Form()
+#     if form.validate_on_submit():
+#         college = College.query.filter_by(name=form.name.data.name).first()
+#         return redirect(
+#             url_for('counselor.edit_college_step2', college_id=college.id))
+#     return render_template(
+#         'counselor/edit_college.html',
+#         form=form,
+#         header='Edit College Profile')
 
 
 @counselor.route('/edit_college/<int:college_id>', methods=['GET', 'POST'])

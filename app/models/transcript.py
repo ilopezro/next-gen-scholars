@@ -23,8 +23,6 @@ class Transcript(db.Model):
         transcript_item = Transcript(student_profile_id='1',file_name='00_Course_Info.pdf')
         transcript_items = []
         transcript_items.append(transcript_item)
-        # db.session.add(transcript_item)
-        # db.session.commit()
         return transcript_items
 
     def __repr__(self):

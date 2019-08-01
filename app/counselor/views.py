@@ -518,7 +518,7 @@ def delete_resource(item_id):
 def edit_resource(item_id):
     resource = Resource.query.filter_by(id=item_id).first()
     form = EditResourceForm(
-        url=resource.resource_url,
+        resource_url=resource.resource_url,
         title=resource.title,
         description=resource.description,
         image_url=resource.image_url

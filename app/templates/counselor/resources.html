@@ -9,14 +9,14 @@
 		</div>
 		
 		<div class="middle aligned content">
-			<h4 style="color: blue"> {{ title }} </h4>
+			<h4 style="color: blue; font-size: 20px; margin-top: 5px;"> {{ title }} </h4>
 			<div class="description" style="margin-bottom: 20px;">
 				<p style="color:black"> {{ description }}</p>
 			</div>
 
 		</div>
-		<a id="edit_resource" class="ui blue basic icon button" href="/counselor/resources/edit/{{ id }}"><i class="ui edit icon"></i></a>
-		<div id="delete_resource"class="ui basic icon button delete-resource-button" data-id="{{ id }}"><i class="ui remove icon"></i></div>
+		<a id="edit_resource" class="ui blue basic icon button edit-resource-button" href="/counselor/resources/edit/{{ id }}"><i class="ui edit icon"></i></a>
+		<div id="delete_resource"class="ui basic icon button red delete-resource-button" data-id="{{ id }}"><i class="ui remove icon"></i></div>
 
 	</div>
 {% endmacro %}
@@ -53,20 +53,17 @@
 <script src="{{ url_for('static', filename='ckeditor/ckeditor.js') }}"></script>
 
 <script type="text/javascript">
+
 	$(document).ready(function() {
 
 		//prevent edit buttons from going to designated URL within each resource
-		$("#edit_resource").click(function(event){
-			event.stopPropagation();  
-		});
-
-		//prevent edit buttons from going to designated URL within each resource
-		$("#delete_resource").click(function(event){
+		$(".edit-resource-button").click(function(event){
 			event.stopPropagation();  
 		});
 
 		// Delete resource 
 		$('.delete-resource-button').click(function() {
+			event.stopPropagation();  //prevent edit buttons from going to designated URL within each resource
 			var url = '/counselor/resources/delete/' + $(this).data('id');
 			$(this).parent().remove();
 			$.ajax({

@@ -38,7 +38,7 @@
             essay progress, and keep track of their scholarship information. Counselors can send out notifications
             and assign tasks to their students, among other things. We wish you luck! 
 
-            <!-- ]{{ page.render_inline_editor(editable_html_obj, current_user) }} -->
+            {{ page.render_inline_editor(editable_html_obj, current_user) }} 
 
         </div>
     </div>
@@ -77,6 +77,6 @@
     </div>
 </div>
 
-
+<script src="{{ url_for('static', filename='ckeditor/ckeditor.js') }}"></script>
 
 {% endblock %}

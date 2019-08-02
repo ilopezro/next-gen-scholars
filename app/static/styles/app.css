@@ -32,26 +32,20 @@ table.selectable tr:hover {
   bottom: 30px;
   right: 30px;
   transition: bottom 1s;
-  display: inline-block;
   box-sizing: border-box;
   border: none;
   border-radius: 100%;
-  padding: 0 16px;
   min-width: 64px;
   height: 64px;
   vertical-align: middle;
   text-align: center;
   text-overflow: ellipsis;
-  text-transform: uppercase;
   color: white;
   background-color: #2D9DDF;
   box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
   font-size: 30px;
-  font-weight: 500;
-  line-height: 36px;
-  overflow: hidden;
-  outline: none;
-  cursor: pointer;
+  padding-left: 11px;
+  line-height: 27px;
   transition: box-shadow 0.2s;
 }
 

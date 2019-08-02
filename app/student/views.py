@@ -512,6 +512,18 @@ def delete_acceptance(item_id):
     return jsonify({"success": "False"})
 
 
+# resources methods
+
+@student.route('/resources')
+@login_required
+def resources():
+    """View all Resources."""
+    resources = Resource.query.all()
+    colors = ['red', 'orange', 'yellow', 'olive', 'green', 'teal', 'blue', 'violet', 'purple', 'pink']
+    editable_html_obj = EditableHTML.get_editable_html('resources')
+    return render_template('student/resources.html', resources=resources, editable_html_obj=editable_html_obj, colors=colors)
+    
+
 # college methods
 
 
@@ -546,15 +558,6 @@ def add_college(student_profile_id):
         header="Add College",
         student_profile_id=student_profile_id)
 
-
-@student.route('/resources')
-@login_required
-def resources():
-    """View all Resources."""
-    resources = Resource.query.all()
-    editable_html_obj = EditableHTML.get_editable_html('resources')
-    return render_template('student/resources.html', resources=resources, editable_html_obj=editable_html_obj)
-    
 
 @student.route('/colleges')
 @login_required

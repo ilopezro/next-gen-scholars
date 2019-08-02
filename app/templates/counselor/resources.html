@@ -2,8 +2,8 @@
 {% extends 'layouts/base.html' %}
 
 
-{% macro resource_m(id, title, url=none, imageSource="none", description=none) %}
-	<div class="ui segment resource_div" style="text-align:center;" onclick="window.location.href='{{url}}';"> 
+{% macro resource_m(id, title, url=none, imageSource="none", description=none, index=0) %}
+	<div class="ui segment resource_div {{ colors[index%10] }}" style="text-align:center;" onclick="window.location.href='{{url}}';"> 
 		<div class="image">
 			<img style="max-width: 100px;" src="{{ imageSource }}">
 		</div>
@@ -40,7 +40,7 @@
 		<div class="ui three column stackable centered container" style="padding-bottom: 100px;">
 			<div class="ui items">
 				{% for r in resources | sort(attribute='title') %}
-					{{ resource_m(r.id, r.title, r.resource_url, r.image_url, r.description) }}
+					{{ resource_m(r.id, r.title, r.resource_url, r.image_url, r.description, loop.index0) }}
 				{% endfor %}  
 			</div>
 		</div>

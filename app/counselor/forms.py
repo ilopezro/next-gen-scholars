@@ -158,23 +158,23 @@ class AddCollegeProfileForm(Form):
     early_deadline = DateField(
         'Early Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
-        validators=[Optional()])
+        validators=[InputRequired()])
     regular_deadline = DateField(
         'Regular Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
-        validators=[Optional()])
+        validators=[InputRequired()])
     scholarship_deadline = DateField(
         'Scholarship Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
-        validators=[Optional()])
+        validators=[InputRequired()])
     fafsa_deadline = DateField(
         'Fafsa Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
-        validators=[Optional()])
+        validators=[InputRequired()])
     acceptance_deadline = DateField(
         'Acceptance Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
-        validators=[Optional()])
+        validators=[InputRequired()])
     image = StringField(
         'URL for image of college',
         validators=[InputRequired()]
@@ -200,23 +200,23 @@ class EditCollegeProfileStep2Form(Form):
     early_deadline = DateField(
         'Early Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
-        validators=[Optional()])
+        validators=[InputRequired()])
     regular_deadline = DateField(
         'Regular Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
-        validators=[Optional()])
+        validators=[InputRequired()])
     scholarship_deadline = DateField(
         'Scholarship Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
-        validators=[Optional()])
+        validators=[InputRequired()])
     fafsa_deadline = DateField(
         'Fafsa Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
-        validators=[Optional()])
+        validators=[InputRequired()])
     acceptance_deadline = DateField(
         'Acceptance Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
-        validators=[Optional()])
+        validators=[InputRequired()])
     image = StringField(
         'URL to image of college',
         validators=[InputRequired()])

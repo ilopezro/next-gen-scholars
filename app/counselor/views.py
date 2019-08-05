@@ -572,7 +572,7 @@ def add_college():
         else:
             flash('College could not be added - already exists in database.',
                   'error')
-        return redirect(url_for('counselor.index'))
+        return redirect(url_for('counselor.colleges'))
     db.session.commit()
     return render_template(
         'counselor/add_college.html', form=form, header='Add College Profile')

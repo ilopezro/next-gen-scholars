@@ -159,6 +159,20 @@ def upload_college_file():
     return render_template('counselor/upload_colleges.html')
 
 
+@counselor.route('/update_all_colleges', methods=['GET', 'POST'])
+@login_required
+@counselor_required
+def update_all_colleges():
+    """Update all existing colleges"""
+    colleges = College.query.all()
+    print(type(colleges))
+    for college in colleges:
+        return jsonify({type(college) : college})
+
+   
+
+    
+
 @counselor.route('/new-user', methods=['GET', 'POST'])
 @login_required
 @counselor_required

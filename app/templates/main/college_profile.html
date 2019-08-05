@@ -18,7 +18,11 @@
             <p><strong>Admission Rate</strong>: 
                 {{ college.admission_rate }}% 
             </p>
-            <p><em>&emsp; Note: Don't be deterred by a low acceptance rate if the rest of your profile fits the school!</em></p>
+
+                {% if college.admission_rate < 30.0 %}
+                <p><em>&emsp; Note: Don't be deterred by a low acceptance rate if the rest of your profile fits the school!</em></p>
+                {% endif %}
+
             {% endif %}
             
             {% if college.school_city != "" %}
@@ -84,7 +88,7 @@
             <p><strong>Acceptance Deadline</strong>: {{ college.acceptance_deadline }}</p>
         </div>
 
-        <div class="ui raised secondary green segment"> 
+        <div class="ui raised secondary green segment" style="margin-bottom: 64px;"> 
             <h1 style="color: #1A85D6;" class="ui header"> Student demographics </h1>
             {% if college.first_generation_percentage != 0 %}
             <p><strong>{{ college.first_generation_percentage }}%</strong> First Generation Students</p>

@@ -1,7 +1,7 @@
 import datetime
 from datetime import date
 import pytz
-from flask import abort, flash, redirect, render_template, url_for, request, jsonify
+from flask import abort, flash, redirect, render_template, url_for, request, jsonify, Flask
 from flask_login import current_user, login_required
 from flask_rq import get_queue
 from .. import csrf
@@ -29,8 +29,10 @@ import os
 import datetime
 import csv
 import io
+import logging
 # TODO: remove before production?
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+app = Flask(__name__)
 
 
 @counselor.route('/')
@@ -312,6 +314,9 @@ def student_database():
                 text=notif_text, student_profile_id=assignee_id)
             db.session.add(notification)
         db.session.commit()
+
+        app.logger.error("first time")
+
         flash('Checklist item added.', 'form-success')
         return redirect(url_for('counselor.student_database'))
 
@@ -418,24 +423,47 @@ def default_checklist():
     form = AddChecklistItemForm()
     if form.validate_on_submit():
         # create new checklist item from form data
-        new_item = ChecklistItem(
-            text=form.item_text.data,
-            assignee_id=current_user.id,
-            creator_role_id=3,
-            is_default_item=True,
-            deadline=form.date.data)
-        db.session.add(new_item)
+        exists = ChecklistItem.query.filter_by(text=form.item_text.data).filter_by(deadline=form.date.data).first()
+
+        if not exists:
+            new_item = ChecklistItem(
+                text=form.item_text.data,
+                assignee_id=current_user.id,
+                creator_role_id=3,
+                is_default_item=True,
+                deadline=form.date.data)
+            db.session.add(new_item)
+
+            users = User.query.filter_by(role_id=1)
+            for user in users:
+                # add new checklist to each user's account
+                if (user == users.first()):
+                    ite = ChecklistItem.query.filter_by(assignee_id=user.student_profile.id).filter_by(text=form.item_text.data).filter_by(deadline=form.date.data).first()
+                    if not ite:
+                        checklist_item = ChecklistItem(
+                            assignee_id=user.student_profile_id,
+                            text=form.item_text.data,
+                            is_deletable=False,
+                            deadline=form.date.data)
+                        db.session.add(checklist_item)
+                else:
+                    checklist_item = ChecklistItem(
+                        assignee_id=user.student_profile_id,
+                        text=form.item_text.data,
+                        is_deletable=False,
+                        deadline=form.date.data)
+                    db.session.add(checklist_item)
+                    
+        db.session.commit()
 
         users = User.query.filter_by(role_id=1)
         for user in users:
             # add new checklist to each user's account
-            checklist_item = ChecklistItem(
-                assignee_id=user.student_profile_id,
-                text=form.item_text.data,
-                is_deletable=False,
-                deadline=form.date.data)
-            db.session.add(checklist_item)
-        db.session.commit()
+            checklist_items = ChecklistItem.query.filter_by(assignee_id=user.student_profile_id)
+            checklist_items = [item for item in checklist_items if not item.is_checked]
+            app.logger.error('adding student stuff')
+            app.logger.error(checklist_items)
+
         return redirect(url_for('counselor.default_checklist'))
     return render_template(
         'counselor/default_checklist.html', form=form, checklist=default_items)

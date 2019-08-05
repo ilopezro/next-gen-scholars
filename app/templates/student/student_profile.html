@@ -90,9 +90,8 @@
       </div>
     </div>
     <div class="nine wide column">
-      <!-- <canvas id="the-canvas"></canvas> -->
-      <object data="{{ url_for('static', filename='secure/01_Vectors.pdf', _external=True) }}" type="application/pdf" width="300" height="200">
-        <a href="{{ url_for('static', filename='secure/01_Vectors.pdf', _external=True) }}">test.pdf</a>
+      <object data="/student/profile/view_transcript/{{ user.student_profile.id }}" type="application/pdf" width="300" height="200">
+        <a href="/student/profile/view_transcript/{{ user.student_profile.id }}">test.pdf</a>
       </object>
       <a class="ui right floated small green basic labeled icon button" href="{{ url_for('student.add_transcript', student_profile_id=user.student_profile.id)}}">
         <i class="plus icon"></i> Add Transcript

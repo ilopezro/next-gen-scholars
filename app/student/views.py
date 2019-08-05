@@ -1,6 +1,6 @@
 import datetime
 from flask import (abort, flash, redirect, render_template, url_for, request,
-                   jsonify, Flask)
+                   jsonify, Flask, send_from_directory)
 from flask_login import current_user, login_required
 from ..models import TestScore, RecommendationLetter, Interest, Essay, College, Major, StudentProfile, ScattergramData, Acceptance, StudentScholarship, Transcript
 from .. import db, csrf
@@ -14,7 +14,7 @@ from .forms import (
     AddAcceptanceForm, EditAcceptanceForm, AddStudentScholarshipForm, EditStudentScholarshipForm, AddTranscriptForm, EditTranscriptForm)
 from ..models import (User, College, Essay, TestScore, ChecklistItem,
                       RecommendationLetter, TestName, Notification,
-                      Acceptance, Scholarship)
+                      Acceptance, Scholarship, Transcript)
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
@@ -31,6 +31,11 @@ import random #for fake college interest
 import logging 
 
 app = Flask(__name__, static_folder='secure', static_url_path='/secure')
+APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+UPLOAD_FOLD = '../static/secure'
+UPLOAD_FOLDER = os.path.join(APP_ROOT, UPLOAD_FOLD)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 
 #load student profile, test scores for profile and comparer
 def load_student_profile(current_user):
@@ -1312,6 +1317,8 @@ def edit_transcript(student_profile_id):
             # db.session.commit()
             
             transcript.file_name = filename
+            f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
             db.session.add(transcript)
             db.session.commit()
             url = get_redirect_url(transcript.student_profile_id)
@@ -1323,21 +1330,30 @@ def edit_transcript(student_profile_id):
             student_profile_id=transcript.student_profile_id)
     abort(404)
 
+@student.route(
+    '/profile/view_transcript/<int:student_profile_id>', methods=['GET'])
+@login_required
+def view_transcript(student_profile_id):
+    transcript = Transcript.query.filter_by(student_profile_id=student_profile_id).first()
+    if transcript:
+        # only allows the student or counselors/admins to access page
+        if transcript.student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
+            abort(404)
+        filename = transcript.file_name
+        app.logger.error('pelase')
+        # app.logger.error(app.config['UPLOAD_FOLDER'] + '01_Vectors.pdf')
+        return send_from_directory(app.config['UPLOAD_FOLDER'], '01_Vectors.pdf')
+    return send_from_directory(app.config['UPLOAD_FOLDER'], '01_Vectors.pdf')
 
-
-
-# @student.route(
-#     '/profile/supplemental_essay/delete/<int:item_id>',
-#     methods=['GET', 'POST'])
-# @login_required
-# @csrf.exempt
-# def delete_supplemental_essay(item_id):
-#     essay = Essay.query.filter_by(id=item_id).first()
-#     if essay:
-#         # only allows the student or counselors/admins to perform action
-#         if essay.student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
-#             return jsonify({"success": "False"})
-#         db.session.delete(essay)
-#         db.session.commit()
-#         return jsonify({"success": "True"})
-#     return jsonify({"success": "False"})
+@app.route('/profile/transcript/<int:student_profile_id>', methods=['GET'])
+@login_required
+def uploaded_transcript(student_profile_id):
+    transcript = Transcript.query.filter_by(student_profile_id=student_profile_id).first()
+    
+    if transcript:
+        # only allows the student or counselors/admins to access page
+        if transcript.student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
+            abort(404)
+        filename = transcript.file_name
+        return send_from_directory(app.config['UPLOAD_FOLDER'], transcript.file_name)
+    return send_from_directory(app.config['UPLOAD_FOLDER'], transcript.file_name)

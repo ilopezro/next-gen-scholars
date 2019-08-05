@@ -1336,7 +1336,9 @@ def edit_transcript(student_profile_id):
     '/profile/view_transcript/<int:student_profile_id>', methods=['GET'])
 @login_required
 def view_transcript(student_profile_id):
+    
     transcript = Transcript.query.filter_by(student_profile_id=student_profile_id).first()
+    app.logger.error(transcript.file_name)
     if transcript:
         # only allows the student or counselors/admins to access page
         if transcript.student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
@@ -1344,8 +1346,9 @@ def view_transcript(student_profile_id):
         filename = transcript.file_name
         app.logger.error('pelase')
         # app.logger.error(app.config['UPLOAD_FOLDER'] + '01_Vectors.pdf')
-        return send_from_directory(app.config['UPLOAD_FOLDER'], '01_Vectors.pdf')
-    return send_from_directory(app.config['UPLOAD_FOLDER'], '01_Vectors.pdf')
+        return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+    app.logger.error("WORK")
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
 @student.route('/profile/delete_transcript/<int:student_profile_id>', methods=['GET', 'POST'])

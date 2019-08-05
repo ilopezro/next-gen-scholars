@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import datetime
 from flask import (abort, flash, redirect, render_template, url_for, request,
                    jsonify, Flask, send_from_directory)
@@ -1105,13 +1106,16 @@ def update_checklist_item(item_id):
             abort(404)
         form = EditChecklistItemForm(item_text=item.text, date=item.deadline)
         if form.validate_on_submit():
-            if item.deadline is not None and form.date.data is not None:
-                update_event(item.cal_event_id, form.item_text.data,
-                             form.date.data)
-            else:
-                if item.deadline is None and form.date.data is not None:
-                    add_to_cal(item.assignee_id, form.item_text.data,
-                               form.date.data)
+            token_uri = current_user.student_profile.cal_token_uri
+            if token_uri is not None:
+                if item.deadline is not None and form.date.data is not None:
+                    update_event(item.cal_event_id, form.item_text.data,
+                                form.date.data)
+                else:
+                    if item.deadline is None and form.date.data is not None:
+                        add_to_cal(item.assignee_id, form.item_text.data,
+                                form.date.data)
+
             item.text = form.item_text.data
             item.deadline = form.date.data
             db.session.add(item)
@@ -1362,15 +1366,3 @@ def delete_transcript(student_profile_id):
     
     url = get_redirect_url(student_profile_id)
     return redirect(url)
-
-# @app.route('/profile/delete_transcript/<int:student_profile_id>/', methods=['GET', 'POST'])
-# @login_required
-# def delete_transcript(student_profile_id):
-#     transcript = Transcript.query.filter_by(student_profile_id=student_profile_id).first()
-#     if transcript:
-#         os.remove(os.path.join(app.config['UPLOAD_FOLDER'], transcript.file_name))
-#         self.session.delete(transcript)
-#         db.session.commit()
-    
-#     url = get_redirect_url(student_profile_id)
-#     return redirect(url)

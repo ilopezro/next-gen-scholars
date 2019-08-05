@@ -911,3 +911,5 @@ def delete_scholarship():
         'counselor/delete_college.html',
         form=form,
         header='Delete Scholarship Profile')
+
+        

@@ -30,7 +30,7 @@ os.environ[
 import random #for fake college interest
 import logging 
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='secure', static_url_path='/secure')
 
 #load student profile, test scores for profile and comparer
 def load_student_profile(current_user):
@@ -1322,6 +1322,8 @@ def edit_transcript(student_profile_id):
             header="Edit Transcript",
             student_profile_id=transcript.student_profile_id)
     abort(404)
+
+
 
 
 # @student.route(

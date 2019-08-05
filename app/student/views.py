@@ -2,7 +2,7 @@ import datetime
 from flask import (abort, flash, redirect, render_template, url_for, request,
                    jsonify, Flask)
 from flask_login import current_user, login_required
-from ..models import TestScore, RecommendationLetter, Interest, Essay, College, Major, StudentProfile, ScattergramData, Acceptance, StudentScholarship
+from ..models import TestScore, RecommendationLetter, Interest, Essay, College, Major, StudentProfile, ScattergramData, Acceptance, StudentScholarship, Transcript
 from .. import db, csrf
 from . import student
 from .forms import (
@@ -11,7 +11,7 @@ from .forms import (
     EditCommonAppEssayForm, AddChecklistItemForm, EditChecklistItemForm,
     EditStudentProfile, AddMajorForm, AddCollegeForm,
     EditRecommendationLetterForm, AddCommonAppEssayForm,
-    AddAcceptanceForm, EditAcceptanceForm, AddStudentScholarshipForm, EditStudentScholarshipForm, AddTranscriptForm)
+    AddAcceptanceForm, EditAcceptanceForm, AddStudentScholarshipForm, EditStudentScholarshipForm, AddTranscriptForm, EditTranscriptForm)
 from ..models import (User, College, Essay, TestScore, ChecklistItem,
                       RecommendationLetter, TestName, Notification,
                       Acceptance, Scholarship)
@@ -23,6 +23,7 @@ import requests
 import os
 import datetime
 from datetime import date
+from werkzeug.utils import secure_filename
 os.environ[
     'OAUTHLIB_INSECURE_TRANSPORT'] = '1'  # TODO: remove before production?
 
@@ -1288,33 +1289,39 @@ def add_transcript(student_profile_id):
         student_profile_id=student_profile_id)
 
 
-# @student.route(
-#     '/profile/transcript/edit/<int:item_id>', methods=['GET', 'POST'])
-# @login_required
-# def edit_transcript(item_id):
-#     transcript = Transcript.query.filter_by(id=item_id).first()
-#     if transcript:
-#         # only allows the student or counselors/admins to access page
-#         if transcript.student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
-#             abort(404)
-#         form = EditTranscript(
-#             file_id=transcript.file_id.data,
-#             file_name=transcript.file_name.data,
-#             file_path=transcript.file_path.data)
-#         if form.validate_on_submit():
-#             essay.name = form.essay_name.data
-#             essay.link = form.link.data
-#             essay.status = form.status.data
-#             db.session.add(essay)
-#             db.session.commit()
-#             url = get_redirect_url(essay.student_profile_id)
-#             return redirect(url)
-#         return render_template(
-#             'student/edit_academic_info.html',
-#             form=form,
-#             header="Edit Supplemental Essay",
-#             student_profile_id=essay.student_profile_id)
-#     abort(404)
+@student.route(
+    '/profile/transcript/edit/<int:student_profile_id>', methods=['GET', 'POST'])
+@login_required
+def edit_transcript(student_profile_id):
+    transcript = Transcript.query.filter_by(student_profile_id=student_profile_id).first()
+    if transcript:
+        # only allows the student or counselors/admins to access page
+        if transcript.student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
+            abort(404)
+        form = EditTranscriptForm(
+            file_name=transcript.file_name)
+        if form.validate_on_submit():
+            f = form.transcript.data
+            filename = secure_filename(f.filename)
+            # f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+            # new_item = Transcript(
+            #     student_profile_id=student_profile_id,
+            #     file_name=filename)
+            # db.session.add(new_item)
+            # db.session.commit()
+            
+            transcript.file_name = filename
+            db.session.add(transcript)
+            db.session.commit()
+            url = get_redirect_url(transcript.student_profile_id)
+            return redirect(url)
+        return render_template(
+            'student/edit_academic_info.html',
+            form=form,
+            header="Edit Transcript",
+            student_profile_id=transcript.student_profile_id)
+    abort(404)
 
 
 # @student.route(

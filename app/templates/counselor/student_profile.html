@@ -76,6 +76,28 @@
     </div>
   </div>
 
+  <!-- DISPLAY TRANSCRIPT -->
+  <div class="row">
+    <div class="twelve wide column">
+      <div style="color: #1A85D6;" class="ui horizontal divider">
+        Transcript
+      </div>
+    </div>
+    <div class="nine wide column">
+      <object
+        data="http://www.pdf995.com/samples/pdf.pdf"
+        type="application/pdf"
+        width="100%"
+        height="100%">
+        <p>Your browser does not support PDFs.
+          <a href="http://www.pdf995.com/samples/pdf.pdf">Download the PDF</a>.</p>
+      </object>
+      <a class="ui right floated small green basic labeled icon button" href="{{ url_for('student.add_transcript', student_profile_id=user.student_profile.id)}}">
+        <i class="plus icon"></i> Add Transcript
+      </a>
+    </div>
+  </div>
+
   <!-- DISPLAY TEST SCORES -->
   <div class="row">
     <div class="twelve wide column">
@@ -115,7 +137,7 @@
         <tfoot class="full-width">
           <tr>
             <th colspan="4">
-              <a class="ui right floated small green basic labeled icon button" href="{{ url_for('student.add_transcript', student_profile_id=user.student_profile.id)}}">
+              <a class="ui right floated small green basic labeled icon button" href="{{ url_for('student.add_test_score', student_profile_id=user.student_profile.id)}}">
                 <i class="plus icon"></i> Add Test Score
               </a>
             </th>

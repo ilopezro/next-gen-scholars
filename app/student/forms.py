@@ -331,7 +331,8 @@ class EditStudentScholarshipForm(Form):
 
 class AddTranscriptForm(Form):
     transcript = FileField()
-    # file_id = StringField('File ID', validators=[InputRequired()])
-    # file_name = StringField('File Name', validators=[InputRequired()])
-    # file_path = StringField('File Path', validators=[InputRequired()])
     submit = SubmitField('Add Transcript')
+
+class EditTranscriptForm(Form):
+    transcript = FileField()
+    submit = SubmitField('Edit Transcript')

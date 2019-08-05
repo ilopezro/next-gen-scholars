@@ -99,6 +99,9 @@
       <a class="ui right floated small green basic labeled icon button" href="{{ url_for('student.edit_transcript', student_profile_id=user.student_profile.id)}}">
         <i class="ui edit icon"></i> Edit Transcript
       </a>
+      <a class="ui right floated small red basic labeled icon button" href="{{ url_for('student.delete_transcript', student_profile_id=user.student_profile.id)}}">
+        <i class="ui edit icon"></i> Delete Transcript
+      </a>
     </div>
   </div>
 

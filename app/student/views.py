@@ -1306,6 +1306,8 @@ def edit_transcript(student_profile_id):
         form = EditTranscriptForm(
             file_name=transcript.file_name)
         if form.validate_on_submit():
+            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], transcript.file_name))
+            
             f = form.transcript.data
             filename = secure_filename(f.filename)
             # f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -1345,15 +1347,27 @@ def view_transcript(student_profile_id):
         return send_from_directory(app.config['UPLOAD_FOLDER'], '01_Vectors.pdf')
     return send_from_directory(app.config['UPLOAD_FOLDER'], '01_Vectors.pdf')
 
-@app.route('/profile/transcript/<int:student_profile_id>', methods=['GET'])
+
+@student.route('/profile/delete_transcript/<int:student_profile_id>', methods=['GET', 'POST'])
 @login_required
-def uploaded_transcript(student_profile_id):
+def delete_transcript(student_profile_id):
     transcript = Transcript.query.filter_by(student_profile_id=student_profile_id).first()
-    
     if transcript:
-        # only allows the student or counselors/admins to access page
-        if transcript.student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
-            abort(404)
-        filename = transcript.file_name
-        return send_from_directory(app.config['UPLOAD_FOLDER'], transcript.file_name)
-    return send_from_directory(app.config['UPLOAD_FOLDER'], transcript.file_name)
+        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], transcript.file_name))
+        db.session.delete(transcript)
+        db.session.commit()
+    
+    url = get_redirect_url(student_profile_id)
+    return redirect(url)
+
+# @app.route('/profile/delete_transcript/<int:student_profile_id>/', methods=['GET', 'POST'])
+# @login_required
+# def delete_transcript(student_profile_id):
+#     transcript = Transcript.query.filter_by(student_profile_id=student_profile_id).first()
+#     if transcript:
+#         os.remove(os.path.join(app.config['UPLOAD_FOLDER'], transcript.file_name))
+#         self.session.delete(transcript)
+#         db.session.commit()
+    
+#     url = get_redirect_url(student_profile_id)
+#     return redirect(url)

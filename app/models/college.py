@@ -359,9 +359,11 @@ class College(db.Model):
                 r.raise_for_status()
                 data = r.json()
             except HTTPError:
-                print('error making request')
+                print('error')
                 break
-        
+            else:
+                college.year_data_collected = year
+                break
         return(data)
 
     @staticmethod

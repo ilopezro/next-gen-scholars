@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import datetime
 from flask import (abort, flash, redirect, render_template, url_for, request,
                    jsonify, Flask, send_from_directory)
@@ -1267,15 +1266,19 @@ def add_transcript(student_profile_id):
     form = AddTranscriptForm()
     if form.validate_on_submit():
         # create new essay from form data
-        f = form.transcript.data
-        filename = secure_filename(f.filename)
-        f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        transcript = Transcript.query.filter_by(student_profile_id=student_profile_id).first()
+        if transcript is None:
+            f = form.transcript.data
+            filename = secure_filename(f.filename)
+            f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-        new_item = Transcript(
-            student_profile_id=student_profile_id,
-            file_name=filename)
-        db.session.add(new_item)
-        db.session.commit()
+            new_item = Transcript(
+                student_profile_id=student_profile_id,
+                file_name=filename)
+            db.session.add(new_item)
+            db.session.commit()
+        else:
+            app.logger.error('already there')
         
         url = get_redirect_url(student_profile_id)
 
@@ -1299,9 +1302,10 @@ def add_transcript(student_profile_id):
 
 
 @student.route(
-    '/profile/transcript/edit/<int:student_profile_id>', methods=['GET', 'POST'])
+    '/profile/transcript/edit/<int:student_profile_id>', methods=['GET', 'POST', 'PUT'])
 @login_required
 def edit_transcript(student_profile_id):
+    app.logger.error('boop')
     transcript = Transcript.query.filter_by(student_profile_id=student_profile_id).first()
     if transcript:
         # only allows the student or counselors/admins to access page
@@ -1314,14 +1318,8 @@ def edit_transcript(student_profile_id):
             
             f = form.transcript.data
             filename = secure_filename(f.filename)
-            # f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            app.logger.error(filename)
 
-            # new_item = Transcript(
-            #     student_profile_id=student_profile_id,
-            #     file_name=filename)
-            # db.session.add(new_item)
-            # db.session.commit()
-            
             transcript.file_name = filename
             f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
@@ -1340,22 +1338,18 @@ def edit_transcript(student_profile_id):
     '/profile/view_transcript/<int:student_profile_id>', methods=['GET'])
 @login_required
 def view_transcript(student_profile_id):
-    
     transcript = Transcript.query.filter_by(student_profile_id=student_profile_id).first()
-    app.logger.error(transcript.file_name)
-    if transcript:
+    app.logger.error(transcript)
+    if transcript is not None:
         # only allows the student or counselors/admins to access page
         if transcript.student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
             abort(404)
         filename = transcript.file_name
-        app.logger.error('pelase')
-        # app.logger.error(app.config['UPLOAD_FOLDER'] + '01_Vectors.pdf')
-        return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
-    app.logger.error("WORK")
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+        app.logger.error(filename)
+        return send_from_directory(app.config['UPLOAD_FOLDER'], '00_Course_Info.pdf')
+    return send_from_directory(app.config['UPLOAD_FOLDER'], '00_Course_Info.pdf')
 
-
-@student.route('/profile/delete_transcript/<int:student_profile_id>', methods=['GET', 'POST'])
+@student.route('/profile/delete_transcript/<int:student_profile_id>', methods=['GET', 'DELETE'])
 @login_required
 def delete_transcript(student_profile_id):
     transcript = Transcript.query.filter_by(student_profile_id=student_profile_id).first()

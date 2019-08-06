@@ -89,8 +89,8 @@
         Transcript
       </div>
     </div>
-    <div class="nine wide column">
-      <object data="/student/profile/view_transcript/{{ user.student_profile.id }}" type="application/pdf" width="300" height="200">
+    <div class="ten wide column">
+      <object data="/student/profile/view_transcript/{{ user.student_profile.id }}" type="application/pdf" width="100%" >
         <a href="/student/profile/view_transcript/{{ user.student_profile.id }}">test.pdf</a>
       </object>
       <a class="ui right floated small green basic labeled icon button" href="{{ url_for('student.add_transcript', student_profile_id=user.student_profile.id)}}">
@@ -623,6 +623,21 @@
         }
       });
     });
+
+    // View Transcript
+    // $('.delete-acceptance-button').click(function() {
+    //   var url = '/student/profile/acceptance/delete/' + $(this).data('id');
+    //   $(this).parent().parent().parent().remove();
+    //   $.ajax({
+    //     url: url,
+    //     type: 'POST',
+    //     success: function(data) {
+    //       if (data.success !== "True") {
+    //         alert("Sorry there was an error, please try again.");
+    //       }
+    //     }
+    //   });
+    // });
   });
 </script>
 {% endblock %}

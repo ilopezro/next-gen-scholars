@@ -333,14 +333,8 @@ class College(db.Model):
         of information about colleges that match with our query name
         @param name: name of the college we need to look up
         @return a dictionary of information about colleges that match with our query'''
-        # Split name by white space, add %20 as the encoding for the space chacracter in query
         name = college.name
-        tokens = name.split()
-        nameNewFormat = ''
-        for token in tokens:
-            nameNewFormat = nameNewFormat + token + "%20"
-        nameNewFormat = nameNewFormat[:-3]
-        nameNewFormat  = nameNewFormat.replace(',', '')
+        nameNewFormat = name.replace(' ', '%20')
 
         while(True):
             try:
@@ -354,6 +348,7 @@ class College(db.Model):
                     year, '.student.demographics.race_ethnicity.black,', year, '.student.demographics.race_ethnicity.hispanic,',
                     year, '.student.demographics.race_ethnicity.asian,', year, '.student.demographics.race_ethnicity.aian,',
                     year, '.student.demographics.race_ethnicity.nhpi,', year, '.student.demographics.race_ethnicity.non_resident_alien',
+                    year, '.cost.',
                     '&api_key=jjHzFLWEyba3YYtWiv7jaQN8kGSkMuf55A9sRsxl'])
                 r = requests.get(urlStr)
                 r.raise_for_status()

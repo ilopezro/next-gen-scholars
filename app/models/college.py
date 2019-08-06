@@ -342,12 +342,9 @@ class College(db.Model):
         nameNewFormat = nameNewFormat[:-3]
         nameNewFormat  = nameNewFormat.replace(',', '')
 
-        # Get current year and keep decrementing the year to get the valid most recent data
-        now = datetime.now()
-        yearNum = now.year
         while(True):
             try:
-                year = str(yearNum)
+                year='latest'
                 urlStr = '' .join(['https://api.data.gov/ed/collegescorecard/v1/schools.json?school.name=',
                     nameNewFormat, '&_fields=school.name,school.city,', year, '.admissions.admission_rate.overall,',
                     year, '.student.size,school.school_url,', year, '.cost.attendance.academic_year,',
@@ -362,10 +359,9 @@ class College(db.Model):
                 r.raise_for_status()
                 data = r.json()
             except HTTPError:
-                yearNum = yearNum - 1
-            else:
-                college.year_data_collected = year
+                print('error making request')
                 break
+        
         return(data)
 
     @staticmethod

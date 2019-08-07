@@ -51,10 +51,10 @@ def load_student_profile(current_user):
             if t.name == 'ACT':
                 act = max(act, t.score) if act != 'N/A' else t.score
         
-        transcript = Transcript.query.filter_by(student_profile_id=student_profile_id).first()
-        if transcript is None:
-            f = form.transcript.data
-            filename = secure_filename(f.filename)
+        pf_id = current_user.student_profile_id
+        transcript = Transcript.query.filter_by(student_profile_id=pf_id).first()
+        if transcript is not None:
+            filename = secure_filename(transcript.file_name)
 
     return student_profile, sat, act, filename
 
@@ -64,7 +64,8 @@ def view_user_profile():
     sat = 'N/A'
     act = 'N/A'
     filename = 'N/A'
-    current_user.student_profile, sat, act = load_student_profile(current_user)
+    current_user.student_profile, sat, act, filename = load_student_profile(current_user)
+    app.logger.error('filename')
     if current_user.student_profile is not None:
         return render_template(
             'student/student_profile.html',
@@ -1301,12 +1302,8 @@ def add_transcript(student_profile_id):
         #     file.save(os.path.going(app.config['UPLOAD_FOLDER'], filename))
         #     return redirect(url_for('uploaded_file', file_name=filename))
 
-        f = app.config['UPLOAD_FOLDER'] + "/" + filename
-        return render_template('student/student_profile.html', 
-                user=current_user,
-                sat=u_sat,
-                act=u_act,
-                filename=filename)
+        url = get_redirect_url(student_profile_id)
+        return redirect(url)
 
     return render_template(
         'student/add_academic_info.html',
@@ -1342,9 +1339,12 @@ def edit_transcript(student_profile_id):
             url = get_redirect_url(transcript.student_profile_id)
 
             f = app.config['UPLOAD_FOLDER'] + "/" + filename
-            return render_template('student/student_profile.html', 
-                user=current_user,
-                filename=filename)
+            # return render_template('student/student_profile.html', 
+            #     user=current_user,
+            #     filename=filename)
+
+            url = get_redirect_url(student_profile_id)
+            return redirect(url)
 
         return render_template(
             'student/edit_academic_info.html',

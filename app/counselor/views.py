@@ -20,7 +20,7 @@ from ..decorators import admin_required
 from ..email import send_email
 from ..models import (Role, User, College, StudentProfile, EditableHTML,
                       ChecklistItem, TestName, College, Notification, SMSAlert,
-                      ScattergramData, Acceptance, Scholarship, fix_url)
+                      ScattergramData, Acceptance, Scholarship, fix_url, interpret_college_name_input)
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
@@ -532,10 +532,14 @@ def add_college():
     form = AddCollegeProfileForm()
     if form.validate_on_submit():
         name = College.query.filter_by(name=form.name.data).first()
+        
+
+
         if name is None:
             # College didn't already exist in database, so add it.
             college = College(
                 name=form.name.data,
+                scorecard_id=interpret_college_name_input(form.college_scorecard_url.data),
                 description=form.description.data,
                 early_deadline=form.early_deadline.data,
                 regular_deadline=form.regular_deadline.data,

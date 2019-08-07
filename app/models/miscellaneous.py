@@ -123,3 +123,17 @@ def fix_url(url):
         url = 'http://' + url
     return url
 
+
+# will parse out the Collegecard ID from either URL or raw id input. 
+# if the name of a college is input, it will return empty string.
+# will return 0 if it is a name, return 1 if it is a number
+def interpret_college_name_input(form_input):
+    inputted_id = re.search('https://collegescorecard.ed.gov/school/?(\d+).+', form_input)
+    if inputted_id is None:
+        return ''
+    
+    groups = inputted_id.groups()
+    for group in groups:
+        if group is not None:
+            return group
+    return ''

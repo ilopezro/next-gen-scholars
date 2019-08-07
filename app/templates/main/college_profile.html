@@ -55,6 +55,7 @@
                     </div>
                 </div>
 
+                {% if college.sat_score_average_overall != 0.0 and college.act_score_average_overall != 0.0 %}
                 <div class="column">
                     {% if college.sat_score_average_overall != 0.0 %}
                         {{create_medium_stat_box("{0:,.0f}".format(college.sat_score_average_overall|round|int), 'Average SAT Score')}}
@@ -63,6 +64,9 @@
                         {{create_medium_stat_box(college.act_score_average_overall|round|int , 'Average ACT Score')}}
                     {% endif %}
                 </div>
+                {% endif %}
+
+
 
                 <div class="column">
                     {% if college.school_city != "" %}
@@ -112,30 +116,48 @@
                             <th>Family Income</th>
                             <th style="margin-left:30px;">Net Price</th>
                         </tr>
+                         {% if college.net_price_0_30000 is not none %}
                         <tr>
                             <td> $0 - $30,000 </td>
                             <td> ${{"{0:,.0f}".format(college.net_price_0_30000)}} </td>
                         </tr>
+                        {% endif %}
+                        
+                        {% if college.net_price_30001_48000 is not none %}
                         <tr>
                             <td> $30,0001 - $48,000 </td>
                             <td> ${{"{0:,.0f}".format(college.net_price_30001_48000)}} </td>
                         </tr>
+                        {% endif %}
+
+                        {% if college.net_price_48001_75000 is not none %}
                         <tr>
                             <td> $48,001 - $75,000 </td>
                             <td> ${{"{0:,.0f}".format(college.net_price_48001_75000)}} </td>
                         </tr>
+                        {% endif %}
+                        
+                        {% if college.net_price_48001_75000 is not none %}
                         <tr>
                             <td> $48,001 - $75,000 </td>
                             <td> ${{"{0:,.0f}".format(college.net_price_48001_75000)}} </td>
                         </tr>
+                        {% endif %}
+
+                        {% if college.net_price_75001_110000 is not none %}
                         <tr>
                             <td> $75,001 - $110,000 </td>
                             <td> ${{"{0:,.0f}".format(college.net_price_75001_110000)}} </td>
                         </tr>
+                        {% endif %}
+
+                        {% if college.net_price_110001_plus is not none %}
                         <tr>
                             <td> $110,001 + </td>
                             <td> ${{"{0:,.0f}".format(college.net_price_110001_plus)}} </td>
                         </tr>
+                        {% endif %}
+
                     </table>
                     {% endif %}
                 </div>

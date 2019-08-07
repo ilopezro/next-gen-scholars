@@ -347,13 +347,19 @@ class College(db.Model):
         @param name: name of the college we need to look up
         @return a dictionary of information about colleges that match with our query'''
 
-        name = college.name
-        nameNewFormat = name.replace(' ', '%20')
+
+        if college.scorecard_id is '':
+            name = 'school.name='+college.name
+            nameNewFormat = name.replace(' ', '%20')
+        else:
+            nameNewFormat='id='+college.scorecard_id
+
+
 
         while(True):
             try:
                 year='latest'
-                urlStr = '' .join(['https://api.data.gov/ed/collegescorecard/v1/schools.json?school.name=',
+                urlStr = '' .join(['https://api.data.gov/ed/collegescorecard/v1/schools.json?',
                     nameNewFormat, 
                     '&_fields=school.name,id,school.city,school.state,school.school_url,school.price_calculator_url,', 
                     'school.minority_serving.hispanic,school.ownership_peps,',

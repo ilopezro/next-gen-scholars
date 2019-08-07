@@ -20,7 +20,7 @@ from ..decorators import admin_required
 from ..email import send_email
 from ..models import (Role, User, College, StudentProfile, EditableHTML,
                       ChecklistItem, TestName, College, Notification, SMSAlert,
-                      ScattergramData, Acceptance, Scholarship)
+                      ScattergramData, Acceptance, Scholarship, fix_url)
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
@@ -85,7 +85,7 @@ def upload_scholarship_file():
                     need_based = (row[7] == "Yes" or row[7] == "yes"),
                     minimum_gpa = row[8],
                     interview_required = (row[9] == "Yes" or row[9] == "yes"),
-                    link = row[10]
+                    link = fix_url(row[10])
                 )
                 db.session.add(scholarship_data)
         db.session.commit()
@@ -208,7 +208,7 @@ def invite_user():
             subject='You Are Invited To Join',
             template='account/email/invite',
             user=user,
-            invite_link=invite_link,
+            invite_link=fix_url(invite_link),
         )
         flash('User {} successfully invited'.format(user.full_name()),
               'form-success')
@@ -829,7 +829,7 @@ def add_scholarship():
                 need_based=form.need_based.data,
                 minimum_gpa=form.minimum_gpa.data,
                 interview_required=form.interview_required.data,
-                link=form.link.data)
+                link=fix_url(form.link.data))
             db.session.add(schol)
         else:
             flash('Scholarship could not be added - already exists in database.', 'error')
@@ -872,7 +872,7 @@ def edit_scholarship_step2(scholarship_id):
         need_based=old_schol.need_based,
         minimum_gpa=old_schol.minimum_gpa,
         interview_required=old_schol.interview_required,
-        link=old_schol.link)
+        link=fix_url(old_schol.link))
     if form.validate_on_submit():
         schol = old_schol
         schol.name = form.name.data
@@ -885,7 +885,7 @@ def edit_scholarship_step2(scholarship_id):
         schol.need_based=form.need_based.data
         schol.minimum_gpa=form.minimum_gpa.data
         schol.interview_required=form.interview_required.data
-        schol.link=form.link.data
+        schol.link=fix_url(form.link.data)
         db.session.add(schol)
         db.session.commit()
         flash('Scholarship profile successfully edited.', 'form-success')

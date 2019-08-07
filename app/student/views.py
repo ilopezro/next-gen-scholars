@@ -14,7 +14,7 @@ from .forms import (
     AddAcceptanceForm, EditAcceptanceForm, AddStudentScholarshipForm, EditStudentScholarshipForm)
 from ..models import (User, College, Essay, TestScore, ChecklistItem,
                       RecommendationLetter, TestName, Notification,
-                      Acceptance, Scholarship)
+                      Acceptance, Scholarship, fix_url)
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
@@ -449,7 +449,7 @@ def add_acceptance(student_profile_id):
             student_profile_id=student_profile_id,
             college=form.college.data.name,
             status=form.status.data,
-            link=form.link.data)
+            link=fix_url(form.link.data))
         db.session.add(new_item)
         db.session.commit()
         url = get_redirect_url(student_profile_id)
@@ -478,7 +478,7 @@ def edit_acceptance(item_id):
         if form.validate_on_submit():
             acceptance.college = form.college.data.name
             acceptance.status = form.status.data
-            acceptance.link = form.link.data
+            acceptance.link = fix_url(form.link.data)
             db.session.add(acceptance)
             db.session.commit()
             url = get_redirect_url(acceptance.student_profile_id)
@@ -585,7 +585,7 @@ def scholarships():
             "Construction Related Fields","Disabled","Engineering","Environmental Interest","Female","Filipino","First Generation College Student",
             "Queer","General","Latinx","Immigrant/AB540/DACA","Interest in Journalism","Japanese","Jewish","Indigenous","Science/Engineering",
             "Student-Athlete","Teaching","Women in Math/Engineering"]
-    return render_template('counselor/scholarships.html', scholarships=scholarships, category_list=category_list)
+    return render_template('student/scholarships.html', scholarships=scholarships, category_list=category_list)
 
 
 # common app essay methods
@@ -603,7 +603,7 @@ def add_common_app_essay(student_profile_id):
     if form.validate_on_submit():
         student_profile = StudentProfile.query.filter_by(
             id=student_profile_id).first()
-        student_profile.common_app_essay = form.link.data
+        student_profile.common_app_essay = fix_url(form.link.data)
         student_profile.common_app_essay_status = form.status.data
         db.session.add(student_profile)
         db.session.commit()
@@ -628,7 +628,7 @@ def edit_common_app_essay(student_profile_id):
         id=student_profile_id).first()
     form = EditCommonAppEssayForm(link=student_profile.common_app_essay)
     if form.validate_on_submit():
-        student_profile.common_app_essay = form.link.data
+        student_profile.common_app_essay = fix_url(form.link.data)
         student_profile.common_app_essay_status = form.status.data
         db.session.add(student_profile)
         db.session.commit()
@@ -679,7 +679,7 @@ def add_supplemental_essay(student_profile_id):
         new_item = Essay(
             student_profile_id=student_profile_id,
             name=form.name.data,
-            link=form.link.data,
+            link=fix_url(form.link.data),
             status=form.status.data)
         db.session.add(new_item)
         db.session.commit()
@@ -706,7 +706,7 @@ def edit_supplemental_essay(item_id):
             essay_name=essay.name, link=essay.link, status=essay.status)
         if form.validate_on_submit():
             essay.name = form.essay_name.data
-            essay.link = form.link.data
+            essay.link = fix_url(form.link.data)
             essay.status = form.status.data
             db.session.add(essay)
             db.session.commit()

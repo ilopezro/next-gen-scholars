@@ -76,27 +76,35 @@
     </div>
   </div>
 
-  <!-- DISPLAY TRANSCRIPT -->
+  <!-- UPLOAD TRANSCRIPT -->
   <div class="row">
-    <div class="twelve wide column">
-      <div style="color: #1A85D6;" class="ui horizontal divider">
-        Transcript
+      <div class="twelve wide column">
+        <div style="color: #1A85D6;" class="ui horizontal divider">
+          Transcript
+        </div>
+      </div>
+      <div class="ten wide column">
+        {% if filename != 'N/A' %}
+        <object data="{{ url_for('student.send_file', file_name=filename) }}" type="application/pdf" width="100%" height="100%" >
+          <a href="{{ url_for('student.send_file', file_name=filename) }}">test.pdf</a>
+        </object>
+        <a class="ui right floated small green basic labeled icon button" href="{{ url_for('student.edit_transcript', student_profile_id=user.student_profile.id)}}">
+          <i class="ui edit icon"></i> Edit Transcript
+        </a>
+        <a class="ui right floated small red basic labeled icon button" href="{{ url_for('student.delete_transcript', student_profile_id=user.student_profile.id)}}">
+          <i class="ui edit icon"></i> Delete Transcript
+        </a>
+        {% else %}
+        <a class="ui right floated small green basic labeled icon button" href="{{ url_for('student.add_transcript', student_profile_id=user.student_profile.id)}}">
+            <i class="plus icon"></i> Add Transcript
+        </a>
+        {% endif %}
+        
+        <br />
+        <br />
+        <br />
       </div>
     </div>
-    <div class="nine wide column">
-      <object
-        data="http://www.pdf995.com/samples/pdf.pdf"
-        type="application/pdf"
-        width="100%"
-        height="100%">
-        <p>Your browser does not support PDFs.
-          <a href="http://www.pdf995.com/samples/pdf.pdf">Download the PDF</a>.</p>
-      </object>
-      <a class="ui right floated small green basic labeled icon button" href="{{ url_for('student.add_transcript', student_profile_id=user.student_profile.id)}}">
-        <i class="plus icon"></i> Add Transcript
-      </a>
-    </div>
-  </div>
 
   <!-- DISPLAY TEST SCORES -->
   <div class="row">

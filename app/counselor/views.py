@@ -30,6 +30,7 @@ import datetime
 import csv
 import io
 import logging
+from werkzeug.utils import secure_filename
 # TODO: remove before production?
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 app = Flask(__name__)
@@ -242,6 +243,7 @@ def view_user_profile(user_id):
         abort(404)
     sat = 'N/A'
     act = 'N/A'
+    filename = 'N/A'
     student_profile = student.student_profile
     if student_profile is not None:
         test_scores = student_profile.test_scores
@@ -250,8 +252,12 @@ def view_user_profile(user_id):
                 sat = max(sat, t.score) if sat != 'N/A' else t.score
             if t.name == 'ACT':
                 act = max(act, t.score) if act != 'N/A' else t.score
+        app.logger.error(user_id)
+        transcript = Transcript.query.filter_by(student_profile_id=student.student_profile_id).first()
+        if transcript is not None:
+            filename = secure_filename(transcript.file_name)
         return render_template(
-            'counselor/student_profile.html', user=student, sat=sat, act=act)
+            'counselor/student_profile.html', user=student, sat=sat, act=act, filename=filename)
     else:
         abort(404)
 

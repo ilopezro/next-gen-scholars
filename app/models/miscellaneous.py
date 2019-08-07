@@ -1,5 +1,5 @@
 from .. import db
-
+import re
 
 class EditableHTML(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -17,7 +17,6 @@ class EditableHTML(db.Model):
 
 
 def get_state_name_from_abbreviation(state):
-
     states = {
             # U.S. States and Washington D.C.
             'AK': 'Alaska',
@@ -113,3 +112,14 @@ def get_state_name_from_abbreviation(state):
             'YT': 'Yukon'
     }
     return states.get(state, '')
+
+
+# will fix URL in user forms so that they are clickable if http/https not included
+# you can always add http because it will get bumped up to https if available, 
+# but you can't bump down from https to http
+def fix_url(url):
+    match = re.search('^https?:\/\/', url)
+    if not match:
+        url = 'http://' + url
+    return url
+

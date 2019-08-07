@@ -1353,27 +1353,6 @@ def edit_transcript(student_profile_id):
             student_profile_id=transcript.student_profile_id)
     abort(404)
 
-# @student.route(
-#     '/profile/view_transcript/<int:student_profile_id>', methods=['GET'])
-# @login_required
-# def view_transcript(student_profile_id):
-#     transcript = Transcript.query.filter_by(student_profile_id=student_profile_id).first()
-#     if transcript.file_name is not None:
-#         # only allows the student or counselors/admins to access page
-#         if transcript.student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
-#             abort(404)
-#         filename = transcript.file_name
-#         app.logger.error('found something')
-#         app.logger.error(filename)
-#         app.logger.error(app.config['UPLOAD_FOLDER'] + filename)
-#         url = get_redirect_url(student_profile_id)
-#         current_user.filename = app.config['UPLOAD_FOLDER'] + "/" + filename
-#         app.logger.error(current_user.filename)
-#         return redirect(url)
-#         # return render_template(student/profile) send_from_directory('UPLOAD_FOLDER', filename)
-#     url = get_redirect_url(student_profile_id)
-#     return redirect(url)
-
 @student.route('/transcripts/<file_name>')
 @login_required
 def send_file(file_name):

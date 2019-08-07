@@ -137,10 +137,43 @@ table.selectable tr:hover {
 
 
 .college_link{
-  display: inline;
+  text-align: center;
+  color: white;
 }
 
-.college_link_icon{
-  color:black;
-  display:block;
+.college_link_icon_padding{
+  margin-top:10px;
+}
+
+.college_link:hover{
+  cursor:pointer;
+}
+
+.uni_web{
+  background-color:#d00014 !important;
+}
+.uni_web:hover{
+  background-color:#d14754 !important;
+}
+
+.uni_cost{
+  background-color:#00abbc !important;
+}
+.uni_cost:hover{
+  background-color:#56c4ce !important;
+
+}
+
+.uni_scd{
+  background-color:#5f9d30 !important;
+}
+.uni_scd:hover{
+  background-color:#8ec466 !important;
+
+}
+
+.link_icon{
+  color:white;
+  font-size: 40px !important;
+  padding-left: 0px; 
 }

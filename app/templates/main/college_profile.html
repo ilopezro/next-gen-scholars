@@ -75,6 +75,7 @@
                 {{ create_link_box(website_url, 'School Website', 'uni_web', 'university') }}
                 {{ create_link_box(net_cost_url, 'Net Cost Calculator', 'uni_cost', 'dollar sign') }}
                 {{ create_link_box('https://collegescorecard.ed.gov/school/?'+college.scorecard_id|string, 'College Scorecard Profile', 'uni_scd', 'chart bar') }}
+            </div>
         </div>
 
         <div class="ui raised secondary green segment college_info"> 
@@ -88,7 +89,7 @@
                 {% endif %}
             </p>
             {% endif %}
-
+        
             {% if college.tuition_in_state != 0.0 and college.tuition_out_of_state != 0.0 %} 
             <p><strong>Tuition</strong>:
                 {% if college.tuition_in_state == college.tuition_out_of_state %} 
@@ -139,9 +140,6 @@
              </table>
 
             {% endif %}
-
-
-            
         </div>
 
         <div class="ui raised secondary green segment college_info">

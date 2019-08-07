@@ -3,20 +3,25 @@
 {% block content %}
 <div class="container" style="padding-bottom:50px; text-align: center; background-image: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url('{{ college.image }}'); background-size: cover;">
     <h1 style="font-size:4.5em; color:white; text-align:center; padding-top:100px; padding-bottom:30px; font-family: 'IBM Plex Serif', serif;">{{ college.name }}</h1>
-
-        {% if college.school_url != "" %}
-        <!-- <button class="ui green button" onclick="window.open('http://{{ college.school_url }}', '_blank')"> School Website </button> -->
-        {% endif %}
-
-        {% if college.price_calculator_url != '' %}
-        <!-- <button class="ui green button" onclick="window.open('{{ college.price_calculator_url }}', '_blank')"> Net Price Calculator </button> -->
-        {% endif %}
-
-        {% if college.school_url != "" %}
-        <!-- <button class="ui green button" onclick="window.open('https://collegescorecard.ed.gov/school/?{{ college.scorecard_id }}', '_blank')"> College Scorecard Profile </button> -->
-        {% endif %}
-
 </div>
+
+{% macro create_medium_stat_box(stat, description, extra_classes=none )%}
+    <div class="ui segment stat_box {{extra_classes}}" >
+        <h2 class="medium_stat_title">{{ stat }}</h2>
+        <h3 class="medium_stat_subtitle"> {{ description }} </h3>
+    </div>
+{% endmacro %}
+
+{% macro create_link_box(url, description, extra_classes=none, icon_class=none)%}
+    <div class="column">
+        <div class="ui segment college_link {{extra_classes}}" onclick="window.open('{{ url }}', '_blank')"> 
+            <div class="college_link_icon_padding link_icon">
+                <i class="{{icon_class}} icon link_icon"></i>
+            </div>
+            {{ description }}
+        </div>
+    </div>
+{% endmacro %}
 
 <div class="ui stackable grid container" style="margin-top:12px; margin-bottom:64px">
     <div class="twelve wide computer sixteen wide mobile centered column">
@@ -37,16 +42,10 @@
 
                 <div class="column">
                     {% if college.sat_score_average_overall != 0.0 %}
-                    <div class="ui segment stat_box" >
-                        <h2 class="medium_stat_title">{{ "{0:,.0f}".format(college.sat_score_average_overall|round|int) }}</h2>
-                        <h3 class="medium_stat_subtitle"> Average SAT Score </h3>
-                    </div>
+                        {{create_medium_stat_box("{0:,.0f}".format(college.sat_score_average_overall|round|int), 'Average SAT Score')}}
                     {% endif %}
                     {% if college.act_score_average_overall != 0.0 %}
-                    <div class="ui segment stat_box">
-                        <h2 class="medium_stat_title">{{ college.act_score_average_overall|round|int }}</h2>
-                        <h3 class="medium_stat_subtitle"> Average ACT Score </h3>
-                    </div>
+                        {{create_medium_stat_box(college.act_score_average_overall|round|int , 'Average ACT Score')}}
                     {% endif %}
                 </div>
 
@@ -57,12 +56,8 @@
                         <h3 class="medium_stat_subtitle"> Location </h3>
                     </div>
                     {% endif %}  
-                    
                     {% if college.school_city != "" %}
-                    <div class="ui segment stat_box">
-                        <h2 class="medium_stat_title">{{"{0:,.0f}".format(college.school_size) }}</h2>
-                        <h3 class="medium_stat_subtitle"> Undergraduate Size </h3>
-                    </div>
+                        {{create_medium_stat_box("{0:,.0f}".format(college.school_size), 'Undergraduate Size')}}
                     {% endif %}  
                 </div>
             </div>
@@ -76,44 +71,16 @@
 
         <div class="ui raised secondary green segment college_info">
             <h1 style="margin-bottom:15px;" class="ui header college_info_section_header">Useful Links</h1>
-            
             <div class="ui three column doubling stackable grid container stretched flex_wrapper">
-                <div class="column">
-                    <div class="ui segment college_link uni_web" onclick="window.open('http://{{ college.school_url }}', '_blank')"> 
-                        <div class="college_link_icon_padding link_icon">
-                            <i class="university icon link_icon"></i>
-                        </div>
-                        School Website
-                    </div>
-                </div>
-                
-                <div class="column">
-                    <div class="ui segment college_link uni_cost" onclick="window.open('{{ college.price_calculator_url }}', '_blank')"> 
-                        <div class="college_link_icon_padding">
-                            <i class="dollar sign icon link_icon"></i>
-                        </div>
-                        Net Cost Calculator 
-                    </div>
-                </div>
-
-                <div class="column">
-                    <div class="ui segment college_link uni_scd" style="background-color:#5f9d30;"onclick="window.open('https://collegescorecard.ed.gov/school/?{{ college.scorecard_id }}', '_blank')"> 
-                        <div class="college_link_icon_padding">
-                            <i class="chart bar icon link_icon"></i>
-                        </div>
-                        College Scorecard Profile
-                    </div>
-                </div>
-                
-            </div>
-            
-
+                {{ create_link_box(website_url, 'School Website', 'uni_web', 'university') }}
+                {{ create_link_box(net_cost_url, 'Net Cost Calculator', 'uni_cost', 'dollar sign') }}
+                {{ create_link_box('https://collegescorecard.ed.gov/school/?'+college.scorecard_id|string, 'College Scorecard Profile', 'uni_scd', 'chart bar') }}
         </div>
 
         <div class="ui raised secondary green segment college_info"> 
             <h1 class="ui header college_info_section_header">Costs</h1>
             {% if college.cost_of_attendance_in_state != 0.0 and college.cost_of_attendance_out_of_state != 0.0 %}
-            <p><strong>Overall Cost of Attendance</strong>:
+            <p><strong>Average Total Cost of Attendance</strong>:
                 {% if college.cost_of_attendance_in_state == college.cost_of_attendance_out_of_state %}
                 ${{ "{0:,.0f}".format(college.cost_of_attendance_in_state) }}
                 {% else %}
@@ -175,6 +142,11 @@
 
 
             
+        </div>
+
+        <div class="ui raised secondary green segment college_info">
+            <h1 class="ui header college_info_section_header">Debt</h1>
+            yikes
         </div>
 
         <div class="ui raised secondary green segment">

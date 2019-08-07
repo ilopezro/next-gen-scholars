@@ -177,12 +177,6 @@ table.selectable tr:hover {
   font-size: 40px !important;
   padding-left: 0px; 
 }
-.flex_wrapper{
-  flex-flow: row wrap;
-  
-  /* Then we define how is distributed the remaining space */
-  justify-content: space-around;
-}
 
 .big_stat_title{
   font-size: 55px;
@@ -210,6 +204,14 @@ table.selectable tr:hover {
 .college_info{
   text-align:center;
 }
+.flex_wrapper{
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+
 .stat_box{
   text-align: center;
 }
+

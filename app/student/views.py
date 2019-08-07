@@ -1137,9 +1137,12 @@ def update_checklist_item(item_id):
 def view_college_profile(college_id):
     college = College.query.filter_by(id=college_id).first()
     state_full_name = get_state_name_from_abbreviation(college.school_state)
+    website_url = fix_url(college.school_url)
+    net_cost_url = fix_url(college.price_calculator_url)
+    
     return render_template(
-        'main/college_profile.html',
-        pageType='college_profile',
+        'main/college_profile.html', website_url=website_url,
+        net_cost_url=net_cost_url, pageType='college_profile',
         college=college, state_full_name=state_full_name)
 
 @student.route('/scholarship_profile/<int:scholarship_id>')

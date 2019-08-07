@@ -158,26 +158,26 @@ class AddCollegeProfileForm(Form):
     early_deadline = DateField(
         'Early Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
-        validators=[InputRequired()])
+        validators=[Optional()])
     regular_deadline = DateField(
         'Regular Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
-        validators=[InputRequired()])
+        validators=[Optional()])
     scholarship_deadline = DateField(
         'Scholarship Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
-        validators=[InputRequired()])
+        validators=[Optional()])
     fafsa_deadline = DateField(
         'Fafsa Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
-        validators=[InputRequired()])
+        validators=[Optional()])
     acceptance_deadline = DateField(
         'Acceptance Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
-        validators=[InputRequired()])
+        validators=[Optional()])
     image = StringField(
         'URL for image of college',
-        validators=[InputRequired()]
+        validators=[Optional()]
     )
     submit = SubmitField('Add College Profile')
 

@@ -194,6 +194,7 @@ table.selectable tr:hover {
 .medium_stat_subtitle{
   margin:0px;
   font-size:13px;
+
 }
 
 .college_info_section_header{
@@ -212,6 +213,7 @@ table.selectable tr:hover {
 
 
 .stat_box{
+  vertical-align: middle;
   text-align: center;
 }
 

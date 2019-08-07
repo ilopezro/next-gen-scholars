@@ -486,10 +486,10 @@ class College(db.Model):
 
             ivy_leagues = {'Cornell University', 'Dartmouth University', 'Brown University', 'Columbia University',
                 'University of Pennsylvania', 'Princeton University', 'Yale University', 'Harvard University'}
-            default = (college.institution_type).capitalize() + ' Instiution in ' + college.school_state
-            college.description = 'Ivy League Institution' if college.name in ivy_leagues else default
-            
-            
+
+            if college.description == '':
+                default = (college.institution_type).capitalize() + ' Instiution in ' + college.school_state
+                college.description = 'Ivy League Institution' if college.name in ivy_leagues else default            
 
 
     @staticmethod

@@ -20,15 +20,15 @@
 
 <div class="ui stackable grid container" style="margin-top:12px; margin-bottom:64px">
     <div class="twelve wide computer sixteen wide mobile centered column">
-        <div class="ui raised secondary green segment" style="text-align:center;">
-            <h1 style="color:#1A85D6;margin-bottom:5px;" class="ui header">{{college.name}} at a Glance</h1>
+        <div class="ui raised secondary green segment college_info">
+            <h1 class="ui header college_info_section_header">{{college.name}} at a Glance</h1>
             <p style="font-size:18px;margin-bottom:15px;">{{ college.description }} </p>
 
-            <div class="ui three column doubling stackable grid container stretched">
+            <div class="ui three column doubling stackable grid container stretched flex_wrapper">
                 <div class="column">
                     <div class="ui segment" style="text-align: center;"> 
-                        <h2 style="font-size: 55px;margin-bottom:0px;"> {{ college.admission_rate }}% </h1>
-                        <h3 style="font-size: 15px;margin-top:0px;"> Acceptance Rate </h2>
+                        <h2 class="big_stat_title"> {{ college.admission_rate }}% </h1>
+                        <h3 class="big_stat_subtitle"> Acceptance Rate </h2>
                         {% if college.admission_rate < 30.0 %}
                         <em>&emsp; Note: Don't be deterred by an acceptance rate if the rest of your profile fits the school!</em>
                         {% endif %}
@@ -37,31 +37,31 @@
 
                 <div class="column">
                     {% if college.sat_score_average_overall != 0.0 %}
-                    <div class="ui segment" style="text-align:center;" >
-                        <h2 style="font-size:34px;margin:0px;">{{ "{0:,.0f}".format(college.sat_score_average_overall|round|int) }}</h2>
-                        <h3 style="margin:0px;font-size:13px;"> Average SAT Score </h3>
+                    <div class="ui segment stat_box" >
+                        <h2 class="medium_stat_title">{{ "{0:,.0f}".format(college.sat_score_average_overall|round|int) }}</h2>
+                        <h3 class="medium_stat_subtitle"> Average SAT Score </h3>
                     </div>
                     {% endif %}
                     {% if college.act_score_average_overall != 0.0 %}
-                    <div class="ui segment" style="text-align:center;">
-                        <h2 style="font-size: 34px;margin:0px;">{{ college.act_score_average_overall|round|int }}</h2>
-                        <h3 style="margin:0px;font-size:13px;"> Average ACT Score </h3>
+                    <div class="ui segment stat_box">
+                        <h2 class="medium_stat_title">{{ college.act_score_average_overall|round|int }}</h2>
+                        <h3 class="medium_stat_subtitle"> Average ACT Score </h3>
                     </div>
                     {% endif %}
                 </div>
 
                 <div class="column">
                     {% if college.school_city != "" %}
-                    <div class="ui segment" style="text-align:center">
+                    <div class="ui segment stat_box">
                         <h2 style="font-size: 20px;margin:0px;">{{ college.school_city }}, {{ state_full_name }}</h2>
-                        <h3 style="margin:0px;font-size:13px;"> Location </h3>
+                        <h3 class="medium_stat_subtitle"> Location </h3>
                     </div>
                     {% endif %}  
                     
                     {% if college.school_city != "" %}
-                    <div class="ui segment" style="text-align:center">
-                        <h2 style="font-size: 34px;margin:0px;">{{"{0:,.0f}".format(college.school_size) }}</h2>
-                        <h3 style="margin:0px;font-size:13px;"> Undergraduate Size </h3>
+                    <div class="ui segment stat_box">
+                        <h2 class="medium_stat_title">{{"{0:,.0f}".format(college.school_size) }}</h2>
+                        <h3 class="medium_stat_subtitle"> Undergraduate Size </h3>
                     </div>
                     {% endif %}  
                 </div>
@@ -74,10 +74,10 @@
         </div>
 
 
-        <div class="ui raised secondary green segment" style="text-align:center;">
-            <h1 style="color:#1A85D6;margin-bottom:15px;" class="ui header">Useful Links</h1>
+        <div class="ui raised secondary green segment college_info">
+            <h1 style="margin-bottom:15px;" class="ui header college_info_section_header">Useful Links</h1>
             
-            <div class="ui three column doubling stackable grid container stretched">
+            <div class="ui three column doubling stackable grid container stretched flex_wrapper">
                 <div class="column">
                     <div class="ui segment college_link uni_web" onclick="window.open('http://{{ college.school_url }}', '_blank')"> 
                         <div class="college_link_icon_padding link_icon">
@@ -110,8 +110,8 @@
 
         </div>
 
-        <div class="ui raised secondary green segment"> 
-            <h1 style="color: #1A85D6;" class="ui header">Costs</h1>
+        <div class="ui raised secondary green segment college_info"> 
+            <h1 class="ui header college_info_section_header">Costs</h1>
             {% if college.cost_of_attendance_in_state != 0.0 and college.cost_of_attendance_out_of_state != 0.0 %}
             <p><strong>Overall Cost of Attendance</strong>:
                 {% if college.cost_of_attendance_in_state == college.cost_of_attendance_out_of_state %}
@@ -146,7 +146,7 @@
                     <th style="margin-left:30px;">Net Price</th>
                 </tr>
                 <tr>
-                    <td> $0 - $30,0000 </td>
+                    <td> $0 - $30,000 </td>
                     <td> ${{"{0:,.0f}".format(college.net_price_0_30000)}} </td>
                 </tr>
                 <tr>
@@ -178,7 +178,7 @@
         </div>
 
         <div class="ui raised secondary green segment">
-            <h1 style="color: #1A85D6;" class="ui header">Deadlines</h1>
+            <h1 class="ui header college_info_section_header">Deadlines</h1>
             <p><strong>Early</strong>: {{ college.early_deadline }}</p>
             <p><strong>Regular</strong>: {{ college.regular_deadline }}</p>
             <p><strong>Scholarship</strong>: {{ college.scholarship_deadline }}</p>
@@ -187,7 +187,7 @@
         </div>
 
         <div class="ui raised secondary green segment" style="margin-bottom: 64px;"> 
-            <h1 style="color: #1A85D6;" class="ui header"> Student Demographics </h1>
+            <h1 class="ui header college_info_section_header"> Student Demographics </h1>
 
             <p><strong> First Generation Students: {{ college.first_generation_percentage }}% </p></strong>
 

@@ -136,3 +136,11 @@ table.selectable tr:hover {
 }
 
 
+.college_link{
+  display: inline;
+}
+
+.college_link_icon{
+  color:black;
+  display:block;
+}

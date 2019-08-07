@@ -3,15 +3,27 @@
 {% block content %}
 <div class="container" style="padding-bottom:50px; text-align: center; background-image: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url('{{ college.image }}'); background-size: cover;">
     <h1 style="font-size:4.5em; color:white; text-align:center; padding-top:100px; padding-bottom:30px; font-family: 'IBM Plex Serif', serif;">{{ college.name }}</h1>
-    {% if college.school_url != "" %}
-    <button onclick="window.open('http://{{ college.school_url }}', '_blank')" class="ui green button">Website</button>
-    {% endif %}
+
+        {% if college.school_url != "" %}
+        <button class="ui green button" onclick="window.open('http://{{ college.school_url }}', '_blank')"> School Website </button>
+        {% endif %}
+
+        {% if college.price_calculator_url != '' %}
+        <button class="ui green button" onclick="window.open('{{ college.price_calculator_url }}', '_blank')"> Net Price Calculator </button>
+        {% endif %}
+
+        {% if college.school_url != "" %}
+        <button class="ui green button" onclick="window.open('https://collegescorecard.ed.gov/school/?{{ college.scorecard_id }}', '_blank')"> Net Price Calculator </button>
+        {% endif %}
+   
+
+
 </div>
 
 <div class="ui stackable grid container" style="margin-top:12px; margin-bottom:64px">
     <div class="twelve wide computer sixteen wide mobile centered column">
         <div class="ui raised secondary green segment">
-            <h1 style="color: #1A85D6;" class="ui header">General Information</h1>
+            <h1 style="color: #1A85D6;" class="ui header">{{college.name}} at a Glance</h1>
             <p><strong>Description:</strong> {{ college.description }} </p>
             
             {% if college.admission_rate != 0.0 %}
@@ -19,15 +31,15 @@
                 {{ college.admission_rate }}% 
             </p>
 
-                {% if college.admission_rate < 30.0 %}
-                <p><em>&emsp; Note: Don't be deterred by a low acceptance rate if the rest of your profile fits the school!</em></p>
-                {% endif %}
+            {% if college.admission_rate < 30.0 %}
+            <p><em>&emsp; Note: Don't be deterred by a low acceptance rate if the rest of your profile fits the school!</em></p>
+            {% endif %}
 
             {% endif %}
             
             {% if college.school_city != "" %}
-            <p><strong>City</strong>: 
-                {{ college.school_city }}
+            <p><strong>Location</strong>: 
+                {{ college.school_city }}, {{ state_full_name }}
             </p>
             {% endif %}
 
@@ -48,6 +60,12 @@
                 {{ college.school_size }}
             </p>
             {% endif %}
+
+            {% if college.is_hispanic_serving == 1%}
+                <p><strong>This school is a hispanic-serving institution.</strong>: 
+            {% endif %}
+
+
         </div>
 
         <div class="ui raised secondary green segment"> 
@@ -77,6 +95,44 @@
                 ${{"{0:,.0f}".format(college.room_and_board)}}
             </p>
             {% endif %} 
+
+
+            {% if college.net_price_0_30000 != 0 %}
+             <table class="ui celled padded table">
+                 <tr>
+                    <th>Family Income</th>
+                    <th style="margin-left:30px;">Net Price</th>
+                </tr>
+                <tr>
+                    <td> $0 - $30,0000 </td>
+                    <td> ${{"{0:,.0f}".format(college.net_price_0_30000)}} </td>
+                </tr>
+                <tr>
+                    <td> $30,0001 - $48,000 </td>
+                    <td> ${{"{0:,.0f}".format(college.net_price_30001_48000)}} </td>
+                </tr>
+                <tr>
+                    <td> $48,001 - $75,000 </td>
+                    <td> ${{"{0:,.0f}".format(college.net_price_48001_75000)}} </td>
+                </tr>
+                <tr>
+                    <td> $48,001 - $75,000 </td>
+                    <td> ${{"{0:,.0f}".format(college.net_price_48001_75000)}} </td>
+                </tr>
+                <tr>
+                    <td> $75,001 - $110,000 </td>
+                    <td> ${{"{0:,.0f}".format(college.net_price_75001_110000)}} </td>
+                </tr>
+                <tr>
+                    <td> $110,001 + </td>
+                    <td> ${{"{0:,.0f}".format(college.net_price_110001_plus)}} </td>
+                </tr>
+             </table>
+
+            {% endif %}
+
+
+            
         </div>
 
         <div class="ui raised secondary green segment">
@@ -89,35 +145,43 @@
         </div>
 
         <div class="ui raised secondary green segment" style="margin-bottom: 64px;"> 
-            <h1 style="color: #1A85D6;" class="ui header"> Student demographics </h1>
-            {% if college.first_generation_percentage != 0 %}
-            <p><strong>{{ college.first_generation_percentage }}%</strong> First Generation Students</p>
-            {% endif %}
+            <h1 style="color: #1A85D6;" class="ui header"> Student Demographics </h1>
 
-            {% if college.race_white != 0 %}
-            <p><strong>{{ college.race_white }}%</strong> White</p>
-            {% endif %}
+            <p><strong> First Generation Students: {{ college.first_generation_percentage }}% </p></strong>
 
-            {% if college.race_black != 0 %}
-            <p><strong>{{ college.race_black }}%</strong> Black</p>
-            {% endif %}
 
-            {% if college.race_hispanic != 0 %}
-            <p><strong>{{ college.race_hispanic }}%</strong> Hispanic</p>
-            {% endif %}
+            <table class="ui celled padded table">
+                <tr>
+                    <th>Race</th>
+                    <th>Percent</th>
+                </tr>
+                <tr>
+                    <td> White </td>
+                    <td> {{ college.first_generation_percentage }}%</td>
+                </tr>
+                <tr>
+                    <td> Black </td>
+                    <td>{{ college.race_black }}%</td>
+                </tr>
+                <tr>
+                    <td> Hispanic </td>
+                    <td> {{ college.race_hispanic }}% </td>
+                </tr>
+                <tr>
+                    <td> Asian </td>
+                    <td> {{ college.race_asian }}% </td>
+                </tr>
+                <tr>
+                    <td> Native American/Alaska Native </td>
+                    <td> {{ college.race_american_indian }}%</td>
+                </tr>
+                <tr>
+                    <td> Native Hawaiian/Pacific Islander </td>
+                    <td> {{ college.race_native_hawaiian }}%</td>
+                </tr>
+            </table>
 
-            {% if college.race_asian != 0 %}
-            <p><strong>{{ college.race_asian }}%</strong> Asian</p>
-            {% endif %}
-
-            {% if college.race_american_indian != 0 %}
-            <p><strong>{{ college.race_american_indian }}%</strong> American Indian/Alaska Native</p>
-            {% endif %}
-
-            {% if college.race_native_hawaiian != 0 %}
-            <p><strong>{{ college.race_native_hawaiian }}%</strong> Native Hawaiian/ Pacific Islander</p>
-            {% endif %}
-
+            
             {% if college.race_international != 0 %}
             <p><strong>{{ college.race_international }}%</strong> International</p>
             {% endif %}

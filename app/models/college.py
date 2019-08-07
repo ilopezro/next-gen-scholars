@@ -23,7 +23,9 @@ headers = {'Plotly-Client-Platform': 'python'}
 
 class College(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    scorecard_id=db.Column(db.Integer,index=True)
     name = db.Column(db.String, index=True)
+    institution_type = db.Column(db.String, index=True) #private, public, proprietary
     description = db.Column(db.String, index=True)
     cost_of_attendance = db.Column(db.Integer, index=True)
     image = db.Column(db.String, index=True)
@@ -36,10 +38,21 @@ class College(db.Model):
     plot_SAT2400 = db.Column(db.String)
     plot_SAT1600 = db.Column(db.String)
     plot_ACT = db.Column(db.String)
+    
+    net_price_0_30000 = db.Column(db.Integer, index=True)
+    net_price_30001_48000 = db.Column(db.Integer, index=True)
+    net_price_48001_75000 = db.Column(db.Integer, index=True)
+    net_price_75001_110000 = db.Column(db.Integer, index=True)
+    net_price_110001_plus = db.Column(db.Integer, index=True)
+
+
     image = db.Column(db.String, index=True)
+    is_hispanic_serving = db.Column(db.Integer, index=True)
     school_url = db.Column(db.String, index=True)
+    price_calculator_url = db.Column(db.String, index=True)
     school_size = db.Column(db.Integer, index=True)
     school_city = db.Column(db.String, index=True)
+    school_state = db.Column(db.String, index=True)
     tuition_in_state = db.Column(db.Float, index=True)
     tuition_out_of_state = db.Column(db.Float, index=True)
     cost_of_attendance_in_state = db.Column(db.Float, index=True)
@@ -333,6 +346,7 @@ class College(db.Model):
         of information about colleges that match with our query name
         @param name: name of the college we need to look up
         @return a dictionary of information about colleges that match with our query'''
+
         name = college.name
         nameNewFormat = name.replace(' ', '%20')
 
@@ -340,16 +354,38 @@ class College(db.Model):
             try:
                 year='latest'
                 urlStr = '' .join(['https://api.data.gov/ed/collegescorecard/v1/schools.json?school.name=',
-                    nameNewFormat, '&_fields=school.name,school.city,', year, '.admissions.admission_rate.overall,',
-                    year, '.student.size,school.school_url,', year, '.cost.attendance.academic_year,',
-                    year, '.cost.tuition.in_state,', year, '.cost.tuition.out_of_state,', year,
-                    '.admissions.act_scores.midpoint.cumulative,', year, '.student.share_firstgeneration,', year,
-                    '.admissions.sat_scores.average.overall,', year, '.student.demographics.race_ethnicity.white,',
-                    year, '.student.demographics.race_ethnicity.black,', year, '.student.demographics.race_ethnicity.hispanic,',
-                    year, '.student.demographics.race_ethnicity.asian,', year, '.student.demographics.race_ethnicity.aian,',
-                    year, '.student.demographics.race_ethnicity.nhpi,', year, '.student.demographics.race_ethnicity.non_resident_alien',
-                    year, '.cost.',
+                    nameNewFormat, 
+                    '&_fields=school.name,id,school.city,school.state,school.school_url,school.price_calculator_url,', 
+                    'school.minority_serving.hispanic,school.ownership_peps,',
+                    year, '.admissions.admission_rate.overall,',
+                    year, '.student.size,', 
+                    year, '.cost.attendance.academic_year,',
+                    year, '.cost.tuition.in_state,', 
+                    year, '.cost.tuition.out_of_state,', 
+
+                    year, '.cost.net_price.public.by_income_level.0-30000,',
+                    year, '.cost.net_price.public.by_income_level.30001-48000,',
+                    year, '.cost.net_price.public.by_income_level.48001-75000,',
+                    year, '.cost.net_price.public.by_income_level.75001-110000,',
+                    year, '.cost.net_price.public.by_income_level.110001-plus,',
+                    year, '.cost.net_price.private.by_income_level.0-30000,',
+                    year, '.cost.net_price.private.by_income_level.30001-48000,',
+                    year, '.cost.net_price.private.by_income_level.48001-75000,',
+                    year, '.cost.net_price.private.by_income_level.75001-110000,',
+                    year, '.cost.net_price.private.by_income_level.110001-plus,',
+
+                    year, '.admissions.act_scores.midpoint.cumulative,', 
+                    year, '.student.share_firstgeneration,', 
+                    year, '.admissions.sat_scores.average.overall,', 
+                    year, '.student.demographics.race_ethnicity.white,',
+                    year, '.student.demographics.race_ethnicity.black,', 
+                    year, '.student.demographics.race_ethnicity.hispanic,',
+                    year, '.student.demographics.race_ethnicity.asian,', 
+                    year, '.student.demographics.race_ethnicity.aian,',
+                    year, '.student.demographics.race_ethnicity.nhpi,', 
+                    year, '.student.demographics.race_ethnicity.non_resident_alien',
                     '&api_key=jjHzFLWEyba3YYtWiv7jaQN8kGSkMuf55A9sRsxl'])
+
                 r = requests.get(urlStr)
                 r.raise_for_status()
                 data = r.json()
@@ -371,7 +407,6 @@ class College(db.Model):
         if(college.name == ''):
             return
         data = College.search_college_scorecard(college)
-
         # If there are some colleges that match with the query
         if(len(data['results']) > 0):
             # Default to the first search result returned
@@ -386,14 +421,26 @@ class College(db.Model):
                         firstFoundIdx = idx
                         result = r
             y = college.year_data_collected
+            
             if result[y + '.admissions.admission_rate.overall'] is not None:
                 college.admission_rate = round(result[y + '.admissions.admission_rate.overall']*100,2)
             if result['school.school_url'] is not None:
                 college.school_url = result['school.school_url']
+            if result['school.price_calculator_url'] is not None:
+                college.price_calculator_url = result['school.price_calculator_url']
+            if result['id'] is not None:
+                college.scorecard_id = result['id']
+            if result['school.ownership_peps'] is not None:
+                ownership_values = { 1 : 'public', 2 : 'private', 3 : 'proprietary'}
+                college.institution_type = ownership_values.get(result['school.ownership_peps'])
             if result[y + '.student.size'] is not None:
                 college.school_size = result[y + '.student.size']
             if result['school.city'] is not None:
                 college.school_city = result['school.city']
+            if result['school.state'] is not None:
+                college.school_state = result['school.state']
+            if result['school.minority_serving.hispanic'] is not None:
+                college.is_hispanic_serving = result['school.minority_serving.hispanic']
             if result[y + '.cost.tuition.in_state'] is not None:
                 college.tuition_in_state = result[y + '.cost.tuition.in_state']
             if result[y + '.cost.tuition.out_of_state'] is not None:
@@ -424,6 +471,26 @@ class College(db.Model):
                 college.race_native_hawaiian = round(result[y + '.student.demographics.race_ethnicity.nhpi']*100,2)
             if result[y + '.student.demographics.race_ethnicity.non_resident_alien'] is not None:
                 college.race_international = round(result[y + '.student.demographics.race_ethnicity.non_resident_alien']*100,2)
+            
+
+            #will only show in-state net price if instiution is public and in CA
+            inst_type_to_get = college.institution_type if college.school_state == 'CA' and result['school.ownership_peps'] == 1\
+                else 'private'
+            college.net_price_0_30000 = result[y+'.cost.net_price.'+inst_type_to_get+'.by_income_level.0-30000']
+            college.net_price_30001_48000 = result[y+'.cost.net_price.'+inst_type_to_get+'.by_income_level.30001-48000']
+            college.net_price_48001_75000 = result[y+'.cost.net_price.'+inst_type_to_get+'.by_income_level.48001-75000']
+            college.net_price_75001_110000 = result[y+'.cost.net_price.'+inst_type_to_get+'.by_income_level.75001-110000']
+            college.net_price_110001_plus = result[y+'.cost.net_price.'+inst_type_to_get+'.by_income_level.110001-plus']
+
+
+
+            ivy_leagues = {'Cornell University', 'Dartmouth University', 'Brown University', 'Columbia University',
+                'University of Pennsylvania', 'Princeton University', 'Yale University', 'Harvard University'}
+            default = (college.institution_type).capitalize() + ' Instiution in ' + college.school_state
+            college.description = 'Ivy League Institution' if college.name in ivy_leagues else default
+            
+            
+
 
     @staticmethod
     def insert_colleges():
@@ -485,11 +552,6 @@ class College(db.Model):
             datetime(2017, 2, 1),
             datetime(2017, 1, 14)
         ]
-        descriptions = [
-            'Private research university', 'Ivy League university',
-            'Liberal arts college', 'Public research university',
-            'Private doctorate university'
-        ]
 
         images = [
             'http://www.collegerank.net/wp-content/uploads/2015/08/morehouse-college-quad.jpg',
@@ -502,7 +564,6 @@ class College(db.Model):
                 college = College(
                     name=c,
                     admission_rate = 0,
-                    description=random.choice(descriptions),
                     regular_deadline=random.choice(regular_deadlines),
                     early_deadline=random.choice(early_deadlines),
                     fafsa_deadline=random.choice(fafsa_deadline),

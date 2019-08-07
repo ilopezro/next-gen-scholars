@@ -14,7 +14,7 @@ from .forms import (
     AddAcceptanceForm, EditAcceptanceForm, AddStudentScholarshipForm, EditStudentScholarshipForm)
 from ..models import (User, College, Essay, TestScore, ChecklistItem,
                       RecommendationLetter, TestName, Notification,
-                      Acceptance, Scholarship)
+                      Acceptance, Scholarship, get_state_name_from_abbreviation)
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
@@ -1136,10 +1136,11 @@ def update_checklist_item(item_id):
 @login_required
 def view_college_profile(college_id):
     college = College.query.filter_by(id=college_id).first()
+    state_full_name = get_state_name_from_abbreviation(college.school_state)
     return render_template(
         'main/college_profile.html',
         pageType='college_profile',
-        college=college)
+        college=college, state_full_name=state_full_name)
 
 @student.route('/scholarship_profile/<int:scholarship_id>')
 @login_required

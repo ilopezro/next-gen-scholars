@@ -2,7 +2,9 @@ import datetime
 from flask import (abort, flash, redirect, render_template, url_for, request,
                    jsonify, Flask, send_from_directory)
 from flask_login import current_user, login_required
-from ..models import TestScore, RecommendationLetter, Interest, Essay, College, Major, StudentProfile, ScattergramData, Acceptance, StudentScholarship, Transcript
+from ..models import (TestScore, RecommendationLetter, Interest, 
+    EditableHTML, Essay, College, Major, Resource, StudentProfile, 
+    ScattergramData, Acceptance, StudentScholarship, Transcript)
 from .. import db, csrf
 from . import student
 from .forms import (
@@ -11,10 +13,11 @@ from .forms import (
     EditCommonAppEssayForm, AddChecklistItemForm, EditChecklistItemForm,
     EditStudentProfile, AddMajorForm, AddCollegeForm,
     EditRecommendationLetterForm, AddCommonAppEssayForm,
-    AddAcceptanceForm, EditAcceptanceForm, AddStudentScholarshipForm, EditStudentScholarshipForm, AddTranscriptForm, EditTranscriptForm)
+    AddAcceptanceForm, EditAcceptanceForm, AddStudentScholarshipForm, EditStudentScholarshipForm,
+    AddTranscriptForm, EditTranscriptForm)
 from ..models import (User, College, Essay, TestScore, ChecklistItem,
                       RecommendationLetter, TestName, Notification,
-                      Acceptance, Scholarship, Transcript)
+                      Acceptance, Scholarship, Transcript, fix_url)
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
@@ -24,6 +27,7 @@ import os
 import datetime
 from datetime import date
 from werkzeug.utils import secure_filename
+
 os.environ[
     'OAUTHLIB_INSECURE_TRANSPORT'] = '1'  # TODO: remove before production?
 
@@ -76,9 +80,7 @@ def view_user_profile():
     else:
         abort(404)
 
-def load_comparer_data_col():
-    colleges = (current_user.student_profile.colleges)
-    return colleges
+
 @student.route('/comparer')
 @login_required
 def comparer():
@@ -97,6 +99,7 @@ def comparer():
     return render_template('student/college_comparer.html', user=current_user, 
         act=act, sat=sat, 
         colleges=colleges, authenticated=True)
+
 
 @student.route('/profile_from_id/<int:student_profile_id>')
 def get_profile_from_id(student_profile_id):
@@ -172,6 +175,7 @@ CLIENT_SECRETS_FILE = os.environ.get('CLIENT_SECRETS_FILE')
 @login_required
 def authorize_calendar():
     # Create flow instance to manage the OAuth 2.0 Authorization Grant Flow steps.
+    CLIENT_SECRETS_FILE = os.environ.get('CLIENT_SECRETS_FILE')
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
         CLIENT_SECRETS_FILE, scopes=SCOPES)
     flow.redirect_uri = url_for('student.oauth2callback', _external=True)
@@ -463,7 +467,7 @@ def add_acceptance(student_profile_id):
             student_profile_id=student_profile_id,
             college=form.college.data.name,
             status=form.status.data,
-            link=form.link.data)
+            link=fix_url(form.link.data))
         db.session.add(new_item)
         db.session.commit()
         url = get_redirect_url(student_profile_id)
@@ -492,7 +496,7 @@ def edit_acceptance(item_id):
         if form.validate_on_submit():
             acceptance.college = form.college.data.name
             acceptance.status = form.status.data
-            acceptance.link = form.link.data
+            acceptance.link = fix_url(form.link.data)
             db.session.add(acceptance)
             db.session.commit()
             url = get_redirect_url(acceptance.student_profile_id)
@@ -520,6 +524,18 @@ def delete_acceptance(item_id):
             return jsonify({"success": "True"})
     return jsonify({"success": "False"})
 
+
+# resources methods
+
+@student.route('/resources')
+@login_required
+def resources():
+    """View all Resources."""
+    resources = Resource.query.all()
+    colors = ['red', 'orange', 'yellow', 'olive', 'green', 'teal', 'blue', 'violet', 'purple', 'pink']
+    editable_html_obj = EditableHTML.get_editable_html('resources')
+    return render_template('student/resources.html', resources=resources, editable_html_obj=editable_html_obj, colors=colors)
+    
 
 # college methods
 
@@ -599,7 +615,7 @@ def scholarships():
             "Construction Related Fields","Disabled","Engineering","Environmental Interest","Female","Filipino","First Generation College Student",
             "Queer","General","Latinx","Immigrant/AB540/DACA","Interest in Journalism","Japanese","Jewish","Indigenous","Science/Engineering",
             "Student-Athlete","Teaching","Women in Math/Engineering"]
-    return render_template('counselor/scholarships.html', scholarships=scholarships, category_list=category_list)
+    return render_template('student/scholarships.html', scholarships=scholarships, category_list=category_list)
 
 
 # common app essay methods
@@ -617,7 +633,7 @@ def add_common_app_essay(student_profile_id):
     if form.validate_on_submit():
         student_profile = StudentProfile.query.filter_by(
             id=student_profile_id).first()
-        student_profile.common_app_essay = form.link.data
+        student_profile.common_app_essay = fix_url(form.link.data)
         student_profile.common_app_essay_status = form.status.data
         db.session.add(student_profile)
         db.session.commit()
@@ -642,7 +658,7 @@ def edit_common_app_essay(student_profile_id):
         id=student_profile_id).first()
     form = EditCommonAppEssayForm(link=student_profile.common_app_essay)
     if form.validate_on_submit():
-        student_profile.common_app_essay = form.link.data
+        student_profile.common_app_essay = fix_url(form.link.data)
         student_profile.common_app_essay_status = form.status.data
         db.session.add(student_profile)
         db.session.commit()
@@ -693,7 +709,7 @@ def add_supplemental_essay(student_profile_id):
         new_item = Essay(
             student_profile_id=student_profile_id,
             name=form.name.data,
-            link=form.link.data,
+            link=fix_url(form.link.data),
             status=form.status.data)
         db.session.add(new_item)
         db.session.commit()
@@ -720,7 +736,7 @@ def edit_supplemental_essay(item_id):
             essay_name=essay.name, link=essay.link, status=essay.status)
         if form.validate_on_submit():
             essay.name = form.essay_name.data
-            essay.link = form.link.data
+            essay.link = fix_url(form.link.data)
             essay.status = form.status.data
             db.session.add(essay)
             db.session.commit()
@@ -938,6 +954,8 @@ def add_to_cal(student_profile_id, text, deadline):
         'scopes': student_profile.cal_scopes
     }
 
+    app.logger.error('done w credentials')
+
     credentials = google.oauth2.credentials.Credentials(**credentials_json)
     service = googleapiclient.discovery.build(
         'calendar', 'v3', credentials=credentials)
@@ -956,6 +974,8 @@ def add_to_cal(student_profile_id, text, deadline):
         },
     }
 
+    app.logger.error('done creating event')
+
     event = service.events().insert(
         calendarId='primary', body=event_body).execute()
     student_profile.cal_token = credentials.token
@@ -966,6 +986,9 @@ def add_to_cal(student_profile_id, text, deadline):
     student_profile.cal_scopes = credentials.scopes
     db.session.add(student_profile)
     db.session.commit()
+
+    app.logger.error('done ')
+
     return {"event_id": event.get('id'), "event_created": True}
 
 
@@ -1123,7 +1146,7 @@ def update_checklist_item(item_id):
                     if item.deadline is None and form.date.data is not None:
                         add_to_cal(item.assignee_id, form.item_text.data,
                                 form.date.data)
-
+            
             item.text = form.item_text.data
             item.deadline = form.date.data
             db.session.add(item)
@@ -1256,6 +1279,8 @@ def delete_student_scholarship(item_id):
             db.session.commit()
             return jsonify({"success": "True"})
     return jsonify({"success": "False"})
+
+
 
 # transcript methods
 

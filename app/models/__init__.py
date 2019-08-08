@@ -21,3 +21,4 @@ from .notification import *
 from .sms_alert import *
 from .scholarship import *
 from .transcript import *
+from .resource import *

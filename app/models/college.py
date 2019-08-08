@@ -348,59 +348,58 @@ class College(db.Model):
         @return a dictionary of information about colleges that match with our query'''
 
 
-        if college.scorecard_id is '':
-            name = 'school.name='+college.name
-            nameNewFormat = name.replace(' ', '%20')
+        if college.scorecard_id is not '':
+            nameNewFormat='id=' + str(college.scorecard_id)
+
         else:
-            nameNewFormat='id='+college.scorecard_id
+            name = 'school.name=' + college.name
+            nameNewFormat = name.replace(' ', '%20')
+            
+        try:
+            data = None
+            year='latest'
+            urlStr = '' .join(['https://api.data.gov/ed/collegescorecard/v1/schools.json?',
+                nameNewFormat, 
+                '&_fields=school.name,id,school.city,school.state,school.school_url,school.price_calculator_url,', 
+                'school.minority_serving.hispanic,school.ownership_peps,',
+                year, '.admissions.admission_rate.overall,',
+                year, '.student.size,', 
+                year, '.cost.attendance.academic_year,',
+                year, '.cost.tuition.in_state,', 
+                year, '.cost.tuition.out_of_state,', 
 
+                year, '.cost.net_price.public.by_income_level.0-30000,',
+                year, '.cost.net_price.public.by_income_level.30001-48000,',
+                year, '.cost.net_price.public.by_income_level.48001-75000,',
+                year, '.cost.net_price.public.by_income_level.75001-110000,',
+                year, '.cost.net_price.public.by_income_level.110001-plus,',
+                year, '.cost.net_price.private.by_income_level.0-30000,',
+                year, '.cost.net_price.private.by_income_level.30001-48000,',
+                year, '.cost.net_price.private.by_income_level.48001-75000,',
+                year, '.cost.net_price.private.by_income_level.75001-110000,',
+                year, '.cost.net_price.private.by_income_level.110001-plus,',
 
+                year, '.admissions.act_scores.midpoint.cumulative,', 
+                year, '.student.share_firstgeneration,', 
+                year, '.admissions.sat_scores.average.overall,', 
+                year, '.student.demographics.race_ethnicity.white,',
+                year, '.student.demographics.race_ethnicity.black,', 
+                year, '.student.demographics.race_ethnicity.hispanic,',
+                year, '.student.demographics.race_ethnicity.asian,', 
+                year, '.student.demographics.race_ethnicity.aian,',
+                year, '.student.demographics.race_ethnicity.nhpi,', 
+                year, '.student.demographics.race_ethnicity.non_resident_alien',
+                '&api_key=jjHzFLWEyba3YYtWiv7jaQN8kGSkMuf55A9sRsxl'])
 
-        while(True):
-            try:
-                year='latest'
-                urlStr = '' .join(['https://api.data.gov/ed/collegescorecard/v1/schools.json?',
-                    nameNewFormat, 
-                    '&_fields=school.name,id,school.city,school.state,school.school_url,school.price_calculator_url,', 
-                    'school.minority_serving.hispanic,school.ownership_peps,',
-                    year, '.admissions.admission_rate.overall,',
-                    year, '.student.size,', 
-                    year, '.cost.attendance.academic_year,',
-                    year, '.cost.tuition.in_state,', 
-                    year, '.cost.tuition.out_of_state,', 
+            r = requests.get(urlStr)
+            r.raise_for_status()
+            data = r.json()
+        except HTTPError:
+            print('error')
+            
+        else:
+            college.year_data_collected = year
 
-                    year, '.cost.net_price.public.by_income_level.0-30000,',
-                    year, '.cost.net_price.public.by_income_level.30001-48000,',
-                    year, '.cost.net_price.public.by_income_level.48001-75000,',
-                    year, '.cost.net_price.public.by_income_level.75001-110000,',
-                    year, '.cost.net_price.public.by_income_level.110001-plus,',
-                    year, '.cost.net_price.private.by_income_level.0-30000,',
-                    year, '.cost.net_price.private.by_income_level.30001-48000,',
-                    year, '.cost.net_price.private.by_income_level.48001-75000,',
-                    year, '.cost.net_price.private.by_income_level.75001-110000,',
-                    year, '.cost.net_price.private.by_income_level.110001-plus,',
-
-                    year, '.admissions.act_scores.midpoint.cumulative,', 
-                    year, '.student.share_firstgeneration,', 
-                    year, '.admissions.sat_scores.average.overall,', 
-                    year, '.student.demographics.race_ethnicity.white,',
-                    year, '.student.demographics.race_ethnicity.black,', 
-                    year, '.student.demographics.race_ethnicity.hispanic,',
-                    year, '.student.demographics.race_ethnicity.asian,', 
-                    year, '.student.demographics.race_ethnicity.aian,',
-                    year, '.student.demographics.race_ethnicity.nhpi,', 
-                    year, '.student.demographics.race_ethnicity.non_resident_alien',
-                    '&api_key=jjHzFLWEyba3YYtWiv7jaQN8kGSkMuf55A9sRsxl'])
-
-                r = requests.get(urlStr)
-                r.raise_for_status()
-                data = r.json()
-            except HTTPError:
-                print('error')
-                break
-            else:
-                college.year_data_collected = year
-                break
         return(data)
 
     @staticmethod
@@ -413,6 +412,10 @@ class College(db.Model):
         if(college.name == ''):
             return
         data = College.search_college_scorecard(college)
+
+        if data is None:
+            return False
+
         # If there are some colleges that match with the query
         if(len(data['results']) > 0):
             # Default to the first search result returned
@@ -495,7 +498,9 @@ class College(db.Model):
 
             if college.description == '':
                 default = (college.institution_type).capitalize() + ' Instiution in ' + college.school_state
-                college.description = 'Ivy League Institution' if college.name in ivy_leagues else default            
+                college.description = 'Ivy League Institution' if college.name in ivy_leagues else default   
+                
+            return True
 
 
     @staticmethod
@@ -570,10 +575,12 @@ class College(db.Model):
                 college = College(
                     name=c,
                     admission_rate = 0,
-                    regular_deadline=random.choice(regular_deadlines),
-                    early_deadline=random.choice(early_deadlines),
-                    fafsa_deadline=random.choice(fafsa_deadline),
-                    acceptance_deadline=random.choice(acceptance_deadline),
+                    scorecard_id = '',
+                    description='',
+                    regular_deadline=None,
+                    early_deadline=None,
+                    fafsa_deadline=None,
+                    acceptance_deadline=None,
                     school_url = "",
                     school_size = 0,
                     school_city = "",
@@ -593,7 +600,7 @@ class College(db.Model):
                     race_american_indian = 0,
                     race_native_hawaiian = 0,
                     race_international = 0,
-                    scholarship_deadline=random.choice(scholarship_deadlines),
+                    scholarship_deadline=None,
                     image=random.choice(images))
                 College.retrieve_college_info(college)
             db.session.add(college)

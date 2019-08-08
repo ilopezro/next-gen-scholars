@@ -138,6 +138,7 @@ def upload_college_file():
                         image = row[7]
                     )
                     College.retrieve_college_info(college)
+    
                 # else update the existing college
                 else:
                     college.description = row[1]
@@ -532,9 +533,6 @@ def add_college():
     form = AddCollegeProfileForm()
     if form.validate_on_submit():
         name = College.query.filter_by(name=form.name.data).first()
-        
-
-
         if name is None:
             # College didn't already exist in database, so add it.
             college = College(
@@ -556,7 +554,11 @@ def add_college():
                 room_and_board = 0,
                 sat_score_average_overall = 0,
                 act_score_average_overall = 0)
-            College.retrieve_college_info(college)
+            add_worked = College.retrieve_college_info(college)
+            if not add_worked:
+                flash('Input Error. Please check your form over.')
+                return render_template(
+                    'counselor/add_college.html', form=form, header='Add College Profile')
             db.session.add(college)
         
         else:

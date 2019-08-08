@@ -607,7 +607,7 @@ def edit_college_step2(college_id):
     if form.validate_on_submit():
         college = old_college
         college.name = form.name.data
-        college.scorecard_id=interpret_scorecard_input(form.college_scorecard_url.data),
+        college.scorecard_id=interpret_scorecard_input(form.college_scorecard_url.data)
         college.description = form.description.data
         college.early_deadline = form.early_deadline.data
         college.regular_deadline = form.regular_deadline.data

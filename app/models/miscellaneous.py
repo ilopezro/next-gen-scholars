@@ -131,7 +131,6 @@ def interpret_scorecard_input(form_input):
     inputted_id = re.search('(?:https?:\/\/collegescorecard\.ed\.gov\/school\/\?)?(\d+)', form_input)
     if inputted_id is None:
         return ''
-    
     groups = inputted_id.groups()
     for group in groups:
         if group is not None:

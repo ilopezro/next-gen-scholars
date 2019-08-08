@@ -585,20 +585,20 @@ def add_college():
         'counselor/add_college.html', form=form, header='Add College Profile')
 
 
-# @counselor.route('/edit_college', methods=['GET', 'POST'])
-# @login_required
-# @counselor_required
-# def edit_college_step1():
-#     # Allows a counselor to choose which college they want to edit.
-#     form = EditCollegeProfileStep1Form()
-#     if form.validate_on_submit():
-#         college = College.query.filter_by(name=form.name.data.name).first()
-#         return redirect(
-#             url_for('counselor.edit_college_step2', college_id=college.id))
-#     return render_template(
-#         'counselor/edit_college.html',
-#         form=form,
-#         header='Edit College Profile')
+@counselor.route('/edit_college', methods=['GET', 'POST'])
+@login_required
+@counselor_required
+def edit_college_step1():
+    # Allows a counselor to choose which college they want to edit.
+    form = EditCollegeProfileStep1Form()
+    if form.validate_on_submit():
+        college = College.query.filter_by(name=form.name.data.name).first()
+        return redirect(
+            url_for('counselor.edit_college_step2', college_id=college.id))
+    return render_template(
+        'counselor/edit_college.html',
+        form=form,
+        header='Edit College Profile')
 
 
 @counselor.route('/edit_college/<int:college_id>', methods=['GET', 'POST'])
@@ -636,6 +636,7 @@ def edit_college_step2(college_id):
         return redirect(url_for('counselor.colleges'))
     return render_template(
         'counselor/edit_college.html',
+        college_id=college_id,
         form=form,
         header='Edit College Profile')
 
@@ -656,6 +657,16 @@ def delete_college():
         'counselor/delete_college.html',
         form=form,
         header='Delete College Profile')
+
+@counselor.route('/delete_college/<int:college_id>', methods=['GET', 'POST'])
+@login_required
+@counselor_required
+def delete_specific_college(college_id):
+    # Allows a counselor to delete a specific college profile.
+    college = College.query.filter_by(id=college_id).first()
+    db.session.delete(college)
+    db.session.commit()
+    return redirect(url_for('counselor.colleges')) 
 
 
 @counselor.route('/alerts', methods=['GET', 'POST'])

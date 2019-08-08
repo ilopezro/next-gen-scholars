@@ -32,7 +32,8 @@
     {% else %}
       {% if current_user.is_student() %}
         {% set endpoints = [
-          ('student.dashboard', 'Tasks', 'tasks'),
+          ('student.index', 'Dashboard', 'dashboard'),
+          ('student.tasks', 'Tasks', 'tasks'),
           ('student.view_user_profile', 'Profile', 'user'),
           ('student.calendar', 'Calendar', 'calendar'),
           ('student.colleges', 'Colleges', 'university'),

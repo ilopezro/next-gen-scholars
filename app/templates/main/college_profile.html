@@ -49,7 +49,7 @@
                     <div class="ui segment" style="text-align: center;"> 
                         <h2 class="big_stat_title"> {{ college.admission_rate }}% </h1>
                         <h3 class="big_stat_subtitle"> Acceptance Rate </h2>
-                        {% if college.admission_rate < 30.0 %}
+                        {% if college.admission_rate is not none and college.admission_rate < 30.0 %}
                         <em>&emsp; Note: Don't be deterred by an acceptance rate if the rest of your profile fits the school!</em>
                         {% endif %}
                     </div>

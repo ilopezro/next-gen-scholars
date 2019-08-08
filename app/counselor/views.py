@@ -20,7 +20,7 @@ from ..decorators import admin_required
 from ..email import send_email
 from ..models import (Role, User, College, StudentProfile, EditableHTML,
                       ChecklistItem, TestName, College, Notification, SMSAlert,
-                      ScattergramData, Acceptance, Scholarship, fix_url, interpret_college_name_input)
+                      ScattergramData, Acceptance, Scholarship, fix_url, interpret_scorecard_input)
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
@@ -529,6 +529,7 @@ def delete_test_name():
 @login_required
 @counselor_required
 def add_college():
+   
     # Allows a counselor to add a college profile.
     form = AddCollegeProfileForm()
     if form.validate_on_submit():
@@ -537,7 +538,7 @@ def add_college():
             # College didn't already exist in database, so add it.
             college = College(
                 name=form.name.data,
-                scorecard_id=interpret_college_name_input(form.college_scorecard_url.data),
+                scorecard_id=interpret_scorecard_input(form.college_scorecard_url.data),
                 description=form.description.data,
                 early_deadline=form.early_deadline.data,
                 regular_deadline=form.regular_deadline.data,
@@ -596,6 +597,7 @@ def edit_college_step2(college_id):
     form = EditCollegeProfileStep2Form(
         name=old_college.name,
         description=old_college.description,
+        college_scorecard_url=old_college.scorecard_id,
         regular_deadline=old_college.regular_deadline,
         early_deadline=old_college.early_deadline,
         scholarship_deadline=old_college.scholarship_deadline,
@@ -605,6 +607,7 @@ def edit_college_step2(college_id):
     if form.validate_on_submit():
         college = old_college
         college.name = form.name.data
+        college.scorecard_id=interpret_scorecard_input(form.college_scorecard_url.data),
         college.description = form.description.data
         college.early_deadline = form.early_deadline.data
         college.regular_deadline = form.regular_deadline.data

@@ -13,7 +13,7 @@ from datetime import datetime
 from app import create_app, db
 from app.models import (Role, User, College, Major, SMSAlert,
                         StudentProfile, ChecklistItem, TestName,
-                        Scholarship, Transcript, Resource)
+                        Scholarship, Resource)
 
 from app.sms import check_alerts
 
@@ -65,6 +65,7 @@ def add_fake_data(number_users):
     User.generate_fake()
     SMSAlert.generate_fake()
 
+
 @manager.command
 def setup_dev():
     """Runs the set-up needed for local development."""
@@ -82,7 +83,6 @@ def setup_general():
        Also sets up first admin, counselor, and student users.."""
     College.insert_colleges()
     Resource.insert_resources()
-    Transcript.generate_fake()
     Scholarship.insert_scholarships()
     Major.insert_majors()
     Role.insert_roles()

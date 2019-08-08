@@ -19,9 +19,8 @@ from ..decorators import counselor_required
 from ..decorators import admin_required
 from ..email import send_email
 from ..models import (Role, User, College, StudentProfile, EditableHTML, 
-                      ChecklistItem, TestName, College, Notification, SMSAlert, Transcript,
+                      ChecklistItem, TestName, College, Notification, SMSAlert,
                       ScattergramData, Acceptance, Scholarship, Resource, fix_url)
-
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
@@ -31,7 +30,6 @@ import datetime
 import csv
 import io
 import logging
-from werkzeug.utils import secure_filename
 # TODO: remove before production?
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 app = Flask(__name__)
@@ -244,7 +242,6 @@ def view_user_profile(user_id):
         abort(404)
     sat = 'N/A'
     act = 'N/A'
-    filename = 'N/A'
     student_profile = student.student_profile
     if student_profile is not None:
         test_scores = student_profile.test_scores
@@ -253,12 +250,8 @@ def view_user_profile(user_id):
                 sat = max(sat, t.score) if sat != 'N/A' else t.score
             if t.name == 'ACT':
                 act = max(act, t.score) if act != 'N/A' else t.score
-        app.logger.error(user_id)
-        transcript = Transcript.query.filter_by(student_profile_id=student.student_profile_id).first()
-        if transcript is not None:
-            filename = secure_filename(transcript.file_name)
         return render_template(
-            'counselor/student_profile.html', user=student, sat=sat, act=act, filename=filename)
+            'counselor/student_profile.html', user=student, sat=sat, act=act)
     else:
         abort(404)
 
@@ -933,7 +926,7 @@ def delete_scholarship():
         form=form,
         header='Delete Scholarship Profile')
 
-  
+
 #resources methods
 
 @counselor.route('/resources')

@@ -48,6 +48,10 @@ class StudentProfile(db.Model):
         'Interest',
         secondary=student_interests,
         backref=db.backref('student_profiles', lazy='dynamic'))
+    # transcript = db.relationship(
+    #     'Transcript',
+    #     secondary=transcripts,
+    #     backref=db.backref('student_profile', lazy='dynamic'))
     
     # APPLICATION INFO
     # either 'Incomplete' or 'Complete'

@@ -33,6 +33,12 @@ import logging
 
 app = Flask(__name__)
 
+@student.route('/')
+@login_required
+def index():
+    """Counselor dashboard page."""
+    return render_template('student/index.html')
+
 #load student profile, test scores for profile and comparer
 def load_student_profile(current_user):
     sat = 'N/A'
@@ -813,9 +819,9 @@ def delete_major(item_id, student_profile_id):
 # checklist methods
 
 
-@student.route('/')
+@student.route('/tasks')
 @login_required
-def dashboard():
+def tasks():
     # get the logged-in user's profile id
     if current_user.student_profile_id:
         return redirect(

@@ -1,10 +1,10 @@
 import datetime
 from flask import (abort, flash, redirect, render_template, url_for, request,
-                   jsonify, Flask, send_from_directory)
+                   jsonify, Flask)
 from flask_login import current_user, login_required
 from ..models import (TestScore, RecommendationLetter, Interest, 
     EditableHTML, Essay, College, Major, Resource, StudentProfile, 
-    ScattergramData, Acceptance, StudentScholarship, Transcript)
+    ScattergramData, Acceptance, StudentScholarship)
 from .. import db, csrf
 from . import student
 from .forms import (
@@ -13,11 +13,10 @@ from .forms import (
     EditCommonAppEssayForm, AddChecklistItemForm, EditChecklistItemForm,
     EditStudentProfile, AddMajorForm, AddCollegeForm,
     EditRecommendationLetterForm, AddCommonAppEssayForm,
-    AddAcceptanceForm, EditAcceptanceForm, AddStudentScholarshipForm, EditStudentScholarshipForm,
-    AddTranscriptForm, EditTranscriptForm)
+    AddAcceptanceForm, EditAcceptanceForm, AddStudentScholarshipForm, EditStudentScholarshipForm)
 from ..models import (User, College, Essay, TestScore, ChecklistItem,
                       RecommendationLetter, TestName, Notification,
-                      Acceptance, Scholarship, Transcript, fix_url)
+                      Acceptance, Scholarship, fix_url)
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
@@ -26,26 +25,24 @@ import requests
 import os
 import datetime
 from datetime import date
-from werkzeug.utils import secure_filename
-
 os.environ[
     'OAUTHLIB_INSECURE_TRANSPORT'] = '1'  # TODO: remove before production?
 
 import random #for fake college interest
 import logging 
 
-app = Flask(__name__, static_folder='secure', static_url_path='/secure')
-APP_ROOT = os.path.dirname(os.path.abspath(__file__))
-UPLOAD_FOLD = '../static/secure'
-UPLOAD_FOLDER = os.path.join(APP_ROOT, UPLOAD_FOLD)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app = Flask(__name__)
 
+@student.route('/')
+@login_required
+def index():
+    """Counselor dashboard page."""
+    return render_template('student/index.html')
 
 #load student profile, test scores for profile and comparer
 def load_student_profile(current_user):
     sat = 'N/A'
     act = 'N/A'
-    filename = 'N/A'
     student_profile = current_user.student_profile
     if student_profile is not None:
         test_scores = student_profile.test_scores
@@ -54,31 +51,28 @@ def load_student_profile(current_user):
                 sat = max(sat, t.score) if sat != 'N/A' else t.score
             if t.name == 'ACT':
                 act = max(act, t.score) if act != 'N/A' else t.score
-        
-        pf_id = current_user.student_profile_id
-        transcript = Transcript.query.filter_by(student_profile_id=pf_id).first()
-        if transcript is not None:
-            filename = secure_filename(transcript.file_name)
 
-    return student_profile, sat, act, filename
+    return student_profile, sat, act
+
 
 @student.route('/profile')
 @login_required
 def view_user_profile():
     sat = 'N/A'
     act = 'N/A'
-    filename = 'N/A'
-    current_user.student_profile, sat, act, filename = load_student_profile(current_user)
-    app.logger.error('filename')
+    current_user.student_profile, sat, act = load_student_profile(current_user)
     if current_user.student_profile is not None:
         return render_template(
             'student/student_profile.html',
             user=current_user,
             sat=sat,
-            act=act,
-            filename=filename)
+            act=act)
     else:
         abort(404)
+
+def load_comparer_data_col():
+    colleges = (current_user.student_profile.colleges)
+    return colleges
 
 
 @student.route('/comparer')
@@ -825,9 +819,9 @@ def delete_major(item_id, student_profile_id):
 # checklist methods
 
 
-@student.route('/')
+@student.route('/tasks')
 @login_required
-def dashboard():
+def tasks():
     # get the logged-in user's profile id
     if current_user.student_profile_id:
         return redirect(
@@ -1279,119 +1273,3 @@ def delete_student_scholarship(item_id):
             db.session.commit()
             return jsonify({"success": "True"})
     return jsonify({"success": "False"})
-
-
-
-# transcript methods
-
-def allowed_file(filename):
-    return '.' in filename and \
-        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-@student.route(
-    '/profile/add_transcript/<int:student_profile_id>',
-    methods=['GET', 'POST'])
-@login_required
-def add_transcript(student_profile_id):
-    # only allows the student or counselors/admins to access page
-    if student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
-        abort(404)
-
-    form = AddTranscriptForm()
-    if form.validate_on_submit():
-        # create new essay from form data
-        transcript = Transcript.query.filter_by(student_profile_id=student_profile_id).first()
-        if transcript is None:
-            f = form.transcript.data
-            filename = secure_filename(f.filename)
-            f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-
-            new_item = Transcript(
-                student_profile_id=student_profile_id,
-                file_name=filename)
-            db.session.add(new_item)
-            db.session.commit()
-        else:
-            app.logger.error('already there')
-        
-        
-        # url = get_redirect_url(student_profile_id)
-
-        # if request.method == 'POST':
-        #     if 'file' not in request.files:
-        #         flash('No file part')
-        #         return redirect(url)
-        # file = request.files['file']
-        # if file and allowed_file(file.filename):
-        #     filename = secure_filename(file.filename)
-        #     file.save(os.path.going(app.config['UPLOAD_FOLDER'], filename))
-        #     return redirect(url_for('uploaded_file', file_name=filename))
-
-        url = get_redirect_url(student_profile_id)
-        return redirect(url)
-
-    return render_template(
-        'student/add_academic_info.html',
-        form=form,
-        header="Add Transcript",
-        student_profile_id=student_profile_id)
-
-
-@student.route(
-    '/profile/transcript/edit/<int:student_profile_id>', methods=['GET', 'POST', 'PUT'])
-@login_required
-def edit_transcript(student_profile_id):
-    transcript = Transcript.query.filter_by(student_profile_id=student_profile_id).first()
-    if transcript:
-        # only allows the student or counselors/admins to access page
-        if transcript.student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
-            abort(404)
-        form = EditTranscriptForm(
-            file_name=transcript.file_name)
-        if form.validate_on_submit():
-            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], transcript.file_name))
-            
-            f = form.transcript.data
-            filename = secure_filename(f.filename)
-            app.logger.error(filename)
-
-            transcript.file_name = filename
-            f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-
-            db.session.add(transcript)
-            db.session.commit()
-            current_user.filename = app.config['UPLOAD_FOLDER'] + "/" + filename
-            url = get_redirect_url(transcript.student_profile_id)
-
-            f = app.config['UPLOAD_FOLDER'] + "/" + filename
-            # return render_template('student/student_profile.html', 
-            #     user=current_user,
-            #     filename=filename)
-
-            url = get_redirect_url(student_profile_id)
-            return redirect(url)
-
-        return render_template(
-            'student/edit_academic_info.html',
-            form=form,
-            header="Edit Transcript",
-            student_profile_id=transcript.student_profile_id)
-    abort(404)
-
-@student.route('/transcripts/<file_name>')
-@login_required
-def send_file(file_name):
-    app.logger.error('send!')
-    return send_from_directory(app.config['UPLOAD_FOLDER'], file_name)
-
-@student.route('/profile/delete_transcript/<int:student_profile_id>', methods=['GET', 'DELETE'])
-@login_required
-def delete_transcript(student_profile_id):
-    transcript = Transcript.query.filter_by(student_profile_id=student_profile_id).first()
-    if transcript:
-        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], transcript.file_name))
-        db.session.delete(transcript)
-        db.session.commit()
-    
-    url = get_redirect_url(student_profile_id)
-    return redirect(url)

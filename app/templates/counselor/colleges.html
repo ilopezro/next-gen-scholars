@@ -43,6 +43,11 @@
                     </thead>
                     <tbody>
                     <!--TODO: Make everything under the same onclick.-->
+                    
+                        
+
+
+
                     {% for c in colleges | sort(attribute='name') %}
                             <td onclick="window.location.href = '{{ url_for('counselor.edit_college_step2', college_id=c.id) }}';">{{ c.name }}</td>
                             <td onclick="window.location.href = '{{ url_for('counselor.edit_college_step2', college_id=c.id) }}';">{{ c.description }}</td>

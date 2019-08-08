@@ -2,7 +2,9 @@ import datetime
 from flask import (abort, flash, redirect, render_template, url_for, request,
                    jsonify, Flask)
 from flask_login import current_user, login_required
-from ..models import TestScore, RecommendationLetter, Interest, Essay, College, Major, StudentProfile, ScattergramData, Acceptance, StudentScholarship
+from ..models import (TestScore, RecommendationLetter, Interest, 
+    EditableHTML, Essay, College, Major, Resource, StudentProfile, 
+    ScattergramData, Acceptance, StudentScholarship)
 from .. import db, csrf
 from . import student
 from .forms import (
@@ -31,6 +33,12 @@ import logging
 
 app = Flask(__name__)
 
+@student.route('/')
+@login_required
+def index():
+    """Counselor dashboard page."""
+    return render_template('student/index.html')
+
 #load student profile, test scores for profile and comparer
 def load_student_profile(current_user):
     sat = 'N/A'
@@ -45,6 +53,7 @@ def load_student_profile(current_user):
                 act = max(act, t.score) if act != 'N/A' else t.score
 
     return student_profile, sat, act
+
 
 @student.route('/profile')
 @login_required
@@ -64,6 +73,8 @@ def view_user_profile():
 def load_comparer_data_col():
     colleges = (current_user.student_profile.colleges)
     return colleges
+
+
 @student.route('/comparer')
 @login_required
 def comparer():
@@ -82,6 +93,7 @@ def comparer():
     return render_template('student/college_comparer.html', user=current_user, 
         act=act, sat=sat, 
         colleges=colleges, authenticated=True)
+
 
 @student.route('/profile_from_id/<int:student_profile_id>')
 def get_profile_from_id(student_profile_id):
@@ -507,6 +519,18 @@ def delete_acceptance(item_id):
     return jsonify({"success": "False"})
 
 
+# resources methods
+
+@student.route('/resources')
+@login_required
+def resources():
+    """View all Resources."""
+    resources = Resource.query.all()
+    colors = ['red', 'orange', 'yellow', 'olive', 'green', 'teal', 'blue', 'violet', 'purple', 'pink']
+    editable_html_obj = EditableHTML.get_editable_html('resources')
+    return render_template('student/resources.html', resources=resources, editable_html_obj=editable_html_obj, colors=colors)
+    
+
 # college methods
 
 
@@ -795,9 +819,9 @@ def delete_major(item_id, student_profile_id):
 # checklist methods
 
 
-@student.route('/')
+@student.route('/tasks')
 @login_required
-def dashboard():
+def tasks():
     # get the logged-in user's profile id
     if current_user.student_profile_id:
         return redirect(

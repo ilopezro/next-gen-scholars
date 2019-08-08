@@ -217,3 +217,11 @@ table.selectable tr:hover {
   text-align: center;
 }
 
+.resource_item{
+  background-color: red;
+  transition: background-color .1s ease .1s ease;
+}
+.resource_div:hover{
+  cursor:pointer;
+  background-color: rgba(34,36,38,.1);
+}

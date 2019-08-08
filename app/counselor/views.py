@@ -4,7 +4,7 @@ import pytz
 from flask import abort, flash, redirect, render_template, url_for, request, jsonify, Flask
 from flask_login import current_user, login_required
 from flask_rq import get_queue
-from .. import csrf
+from .. import db, csrf
 from .forms import (ChangeAccountTypeForm, ChangeUserEmailForm, InviteUserForm,
                     NewUserForm, AddChecklistItemForm, AddTestNameForm,
                     EditTestNameForm, DeleteTestNameForm,
@@ -12,15 +12,15 @@ from .forms import (ChangeAccountTypeForm, ChangeUserEmailForm, InviteUserForm,
                     EditCollegeProfileStep2Form, DeleteCollegeProfileForm,
                     NewSMSAlertForm, EditSMSAlertForm, ParseAwardLetterForm,
                     AddScholarshipProfileForm, EditScholarshipProfileStep1Form,
-                    EditScholarshipProfileStep2Form, DeleteScholarshipProfileForm)
+                    EditScholarshipProfileStep2Form,EditResourceForm, AddResourceForm,
+                    DeleteScholarshipProfileForm)
 from . import counselor
-from .. import db
 from ..decorators import counselor_required
 from ..decorators import admin_required
 from ..email import send_email
-from ..models import (Role, User, College, StudentProfile, EditableHTML,
+from ..models import (Role, User, College, StudentProfile, EditableHTML, 
                       ChecklistItem, TestName, College, Notification, SMSAlert,
-                      ScattergramData, Acceptance, Scholarship, fix_url, interpret_scorecard_input)
+                      ScattergramData, Acceptance, Scholarship, fix_url, interpret_scorecard_input, Resource)
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
@@ -484,10 +484,25 @@ def add_test_name():
             db.session.add(test)
             db.session.commit()
         else:
-            flash('Test could not be added - already existed in database.',
+            flash('Test could not be added - test already exists in the database.',
                   'error')
         return redirect(url_for('counselor.index'))
     return render_template('counselor/add_test_name.html', form=form)
+
+
+@login_required
+@counselor.route(
+    '/resources/delete/<int:item_id>', methods=['GET', 'POST'])
+@csrf.exempt
+def delete_resource(item_id):
+    resource = Resource.query.filter_by(id=item_id).first()
+    if resource:
+        # only allows the counselors/admins to perform action
+        if current_user.role_id >= 2:
+            db.session.delete(resource)
+            db.session.commit()
+            return jsonify({"success": "True"})
+    return jsonify({"success": "False"})
 
 
 @counselor.route('/edit_test', methods=['GET', 'POST'])
@@ -523,7 +538,6 @@ def delete_test_name():
         'counselor/delete_test_name.html',
         form=form,
         header='Delete Test Name')
-
 
 @counselor.route('/add_college', methods=['GET', 'POST'])
 @login_required
@@ -571,20 +585,20 @@ def add_college():
         'counselor/add_college.html', form=form, header='Add College Profile')
 
 
-@counselor.route('/edit_college', methods=['GET', 'POST'])
-@login_required
-@counselor_required
-def edit_college_step1():
-    # Allows a counselor to choose which college they want to edit.
-    form = EditCollegeProfileStep1Form()
-    if form.validate_on_submit():
-        college = College.query.filter_by(name=form.name.data.name).first()
-        return redirect(
-            url_for('counselor.edit_college_step2', college_id=college.id))
-    return render_template(
-        'counselor/edit_college.html',
-        form=form,
-        header='Edit College Profile')
+# @counselor.route('/edit_college', methods=['GET', 'POST'])
+# @login_required
+# @counselor_required
+# def edit_college_step1():
+#     # Allows a counselor to choose which college they want to edit.
+#     form = EditCollegeProfileStep1Form()
+#     if form.validate_on_submit():
+#         college = College.query.filter_by(name=form.name.data.name).first()
+#         return redirect(
+#             url_for('counselor.edit_college_step2', college_id=college.id))
+#     return render_template(
+#         'counselor/edit_college.html',
+#         form=form,
+#         header='Edit College Profile')
 
 
 @counselor.route('/edit_college/<int:college_id>', methods=['GET', 'POST'])
@@ -920,3 +934,67 @@ def delete_scholarship():
         'counselor/delete_college.html',
         form=form,
         header='Delete Scholarship Profile')
+
+
+#resources methods
+
+@counselor.route('/resources')
+@login_required
+def resources():
+    """View all Resources."""
+    resources = Resource.query.all()
+    editable_html_obj = EditableHTML.get_editable_html('resources')
+    colors = ['red', 'orange', 'yellow', 'olive', 'green', 'teal', 'blue', 'violet', 'purple', 'pink']
+    return render_template('counselor/resources.html', resources=resources, editable_html_obj=editable_html_obj, colors=colors)
+
+@login_required
+@counselor.route(
+    '/resources/edit/<int:item_id>', methods=['GET', 'POST'])
+@csrf.exempt
+def edit_resource(item_id):
+    resource = Resource.query.filter_by(id=item_id).first()
+    form = EditResourceForm(
+        resource_url=resource.resource_url,
+        title=resource.title,
+        description=resource.description,
+        image_url=resource.image_url
+    )    
+    if not resource:
+        abort(404)
+    if form.validate_on_submit():
+        resource_new = resource
+        resource_new.resource_url = form.resource_url.data
+        resource_new.title = form.title.data
+        resource_new.description = form.description.data
+        resource_new.image_url = form.image_url.data
+        db.session.add(resource_new)
+        db.session.commit()
+        flash('Resource successfully edited.', 'form-success')
+        return redirect(url_for('counselor.resources'))
+    return render_template('counselor/edit_resource.html', form=form, 
+        resource=resource, header='Edit Resource')
+
+@counselor.route('/add_resource', methods=['GET', 'POST'])
+@login_required
+@counselor_required
+def add_resource():
+    # Allows a counselor to add a college profile.
+    form = AddResourceForm()
+    if form.validate_on_submit():
+        resource_url = Resource.query.filter_by(resource_url=form.resource_url.data).first()
+        if resource_url is None:
+            # College didn't already exist in database, so add it.
+            resource = Resource(
+                resource_url=form.resource_url.data,
+                title=form.title.data,
+                description=form.description.data,
+                image_url=form.image_url.data
+            )
+            db.session.add(resource)
+        else:
+            flash('Resource could not be added - already exists in database.',
+                  'error')
+        return redirect(url_for('counselor.resources'))
+    db.session.commit()
+    return render_template(
+        'counselor/add_resource.html', form=form, header='Add Resource')

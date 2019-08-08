@@ -2,7 +2,9 @@ import datetime
 from flask import (abort, flash, redirect, render_template, url_for, request,
                    jsonify, Flask)
 from flask_login import current_user, login_required
-from ..models import TestScore, RecommendationLetter, Interest, Essay, College, Major, StudentProfile, ScattergramData, Acceptance, StudentScholarship
+from ..models import (TestScore, RecommendationLetter, Interest, 
+    EditableHTML, Essay, College, Major, Resource, StudentProfile, 
+    ScattergramData, Acceptance, StudentScholarship)
 from .. import db, csrf
 from . import student
 from .forms import (
@@ -46,6 +48,7 @@ def load_student_profile(current_user):
 
     return student_profile, sat, act
 
+
 @student.route('/profile')
 @login_required
 def view_user_profile():
@@ -64,6 +67,8 @@ def view_user_profile():
 def load_comparer_data_col():
     colleges = (current_user.student_profile.colleges)
     return colleges
+
+
 @student.route('/comparer')
 @login_required
 def comparer():
@@ -82,6 +87,7 @@ def comparer():
     return render_template('student/college_comparer.html', user=current_user, 
         act=act, sat=sat, 
         colleges=colleges, authenticated=True)
+
 
 @student.route('/profile_from_id/<int:student_profile_id>')
 def get_profile_from_id(student_profile_id):
@@ -506,6 +512,18 @@ def delete_acceptance(item_id):
             return jsonify({"success": "True"})
     return jsonify({"success": "False"})
 
+
+# resources methods
+
+@student.route('/resources')
+@login_required
+def resources():
+    """View all Resources."""
+    resources = Resource.query.all()
+    colors = ['red', 'orange', 'yellow', 'olive', 'green', 'teal', 'blue', 'violet', 'purple', 'pink']
+    editable_html_obj = EditableHTML.get_editable_html('resources')
+    return render_template('student/resources.html', resources=resources, editable_html_obj=editable_html_obj, colors=colors)
+    
 
 # college methods
 

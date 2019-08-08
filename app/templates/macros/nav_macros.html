@@ -32,13 +32,14 @@
     {% else %}
       {% if current_user.is_student() %}
         {% set endpoints = [
-          ('student.dashboard', 'Tasks', 'tasks'),
+          ('student.index', 'Dashboard', 'dashboard'),
+          ('student.tasks', 'Tasks', 'tasks'),
           ('student.view_user_profile', 'Profile', 'user'),
           ('student.calendar', 'Calendar', 'calendar'),
           ('student.colleges', 'Colleges', 'university'),
           ('student.scholarships', 'Scholarships', 'money bill alternate outline icon'),
+          ('student.resources', 'Resources', 'file text outline')
 
-          ('main.resources', 'Resources', 'file text outline')
         ] %}
       {% elif current_user.is_counselor() %}
         {% set endpoints = [
@@ -47,7 +48,7 @@
           ('main.calendar', 'Calendar', 'calendar'),
           ('counselor.colleges', 'Colleges', 'university'),
           ('counselor.scholarships', 'Scholarships', 'money bill alternate outline icon'),
-          ('main.resources', 'Resources', 'file text outline')
+          ('counselor.resources', 'Resources', 'file text outline')
         ] %}
       {% else %}
         {% set endpoints = [
@@ -56,7 +57,7 @@
           ('main.calendar', 'Calendar', 'calendar'),
           ('counselor.colleges', 'Colleges', 'university'),
           ('counselor.scholarships', 'Scholarships', 'money bill alternate outline icon'),          
-          ('main.resources', 'Resources', 'file text outline')
+          ('counselor.resources', 'Resources', 'file text outline')
         ] %}
       {% endif %}
     {% endif %}

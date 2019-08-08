@@ -4,14 +4,14 @@
 <div class="container" style="padding-bottom:50px; text-align: center; background-image: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url('{{ college.image }}'); background-size: cover;">
     <h1 style="font-size:4.5em; color:white; text-align:center; padding-top:100px; padding-bottom:30px; font-family: 'IBM Plex Serif', serif;">{{ college.name }}</h1>
     {% if college.school_url != "" %}
-    <button onclick="window.open('http://{{ college.school_url }}', '_blank')" class="ui green button">Website</button>
+    <button onclick="window.open('http://{{ college.school_url }}', '_blank')" class="ui button" style="background-color:#F5C75B;">Website</button>
     {% endif %}
 </div>
 
 <div class="ui stackable grid container" style="margin-top:12px; margin-bottom:64px">
     <div class="twelve wide computer sixteen wide mobile centered column">
         <div class="ui raised secondary green segment">
-            <h1 style="color: #1A85D6;" class="ui header">General Information</h1>
+            <h1 style="color: #2AB088;" class="ui header">General Information</h1>
             <p><strong>Description:</strong> {{ college.description }} </p>
             
             {% if college.admission_rate != 0.0 %}
@@ -51,7 +51,7 @@
         </div>
 
         <div class="ui raised secondary green segment"> 
-            <h1 style="color: #1A85D6;" class="ui header">Costs</h1>
+            <h1 style="color: #2AB088;" class="ui header">Costs</h1>
             {% if college.cost_of_attendance_in_state != 0.0 and college.cost_of_attendance_out_of_state != 0.0 %}
             <p><strong>Overall Cost of Attendance</strong>:
                 {% if college.cost_of_attendance_in_state == college.cost_of_attendance_out_of_state %}
@@ -80,7 +80,7 @@
         </div>
 
         <div class="ui raised secondary green segment">
-            <h1 style="color: #1A85D6;" class="ui header">Deadlines</h1>
+            <h1 style="color: #2AB088;" class="ui header">Deadlines</h1>
             <p><strong>Early</strong>: {{ college.early_deadline }}</p>
             <p><strong>Regular</strong>: {{ college.regular_deadline }}</p>
             <p><strong>Scholarship</strong>: {{ college.scholarship_deadline }}</p>
@@ -89,7 +89,7 @@
         </div>
 
         <div class="ui raised secondary green segment" style="margin-bottom: 64px;"> 
-            <h1 style="color: #1A85D6;" class="ui header"> Student demographics </h1>
+            <h1 style="color: #2AB088;" class="ui header"> Student demographics </h1>
             {% if college.first_generation_percentage != 0 %}
             <p><strong>{{ college.first_generation_percentage }}%</strong> First Generation Students</p>
             {% endif %}

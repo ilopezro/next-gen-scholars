@@ -225,3 +225,7 @@ table.selectable tr:hover {
   cursor:pointer;
   background-color: rgba(34,36,38,.1);
 }
+
+.college_info_table{
+  text-align: center !important;
+}

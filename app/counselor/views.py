@@ -20,7 +20,8 @@ from ..decorators import admin_required
 from ..email import send_email
 from ..models import (Role, User, College, StudentProfile, EditableHTML, 
                       ChecklistItem, TestName, College, Notification, SMSAlert,
-                      ScattergramData, Acceptance, Scholarship, fix_url, interpret_scorecard_input, Resource)
+                      ScattergramData, Acceptance, Scholarship, fix_url, interpret_scorecard_input, 
+                      get_colors, Resource)
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
@@ -955,8 +956,7 @@ def resources():
     """View all Resources."""
     resources = Resource.query.all()
     editable_html_obj = EditableHTML.get_editable_html('resources')
-    colors = ['red', 'orange', 'yellow', 'olive', 'green', 'teal', 'blue', 'violet', 'purple', 'pink']
-    return render_template('counselor/resources.html', resources=resources, editable_html_obj=editable_html_obj, colors=colors)
+    return render_template('counselor/resources.html', resources=resources, editable_html_obj=editable_html_obj, colors=get_colors())
 
 @login_required
 @counselor.route(

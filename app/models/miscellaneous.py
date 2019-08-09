@@ -136,3 +136,6 @@ def interpret_scorecard_input(form_input):
         if group is not None:
             return group
     return ''
+
+def get_colors():
+    return ('red', 'orange', 'yellow', 'olive', 'green', 'teal', 'blue', 'violet', 'purple', 'pink')

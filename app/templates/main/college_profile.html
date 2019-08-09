@@ -24,7 +24,20 @@
     </div>
 {% endmacro %}
 
-
+{% macro create_table_row(left, right, type=none) %}
+    {% if right is not none %}
+    <tr>
+        <td> {{left}} </td>
+        {% if type == 'money'%}
+        <td> {{ "${0:,.0f}".format(right) }}</td>
+        {% elif type == 'percent' %}
+        <td> {{ right }}%</td>
+        {% else %}
+        <td> {{ right }}</td>
+        {% endif%}
+    </tr>
+    {% endif %}
+{% endmacro %}
 
 <div class="ui stackable grid container" style="margin-top:12px; margin-bottom:64px">
     <div class="twelve wide computer sixteen wide mobile centered column">
@@ -36,6 +49,7 @@
                 {{ create_link_box(net_cost_url, 'Net Cost Calculator', 'uni_cost', 'dollar sign') }}
                 {{ create_link_box('https://collegescorecard.ed.gov/school/?'+college.scorecard_id|string, 'College Scorecard Profile', 'uni_scd', 'chart bar') }}
             </div>
+        
         </div>
 
         <div class="ui raised secondary green segment college_info">
@@ -112,6 +126,7 @@
 
                     </div>
                 </div>
+
                 {% if college.net_price_0_30000 is not none and 
                     college.net_price_30001_48000 is not none and
                     college.net_price_48001_75000 is not none and
@@ -119,59 +134,58 @@
                     college.net_price_110001_plus is not none
                 %}
                 <div class="column">
-
-                    <table class="ui celled padded table">
+                    <table class="ui celled padded table college_info_table">
                         <tr>
                             <th>Family Income</th>
                             <th style="margin-left:30px;">Net Price</th>
                         </tr>
-                         {% if college.net_price_0_30000 is not none %}
-                        <tr>
-                            <td> $0 - $30,000 </td>
-                            <td> ${{"{0:,.0f}".format(college.net_price_0_30000)}} </td>
-                        </tr>
-                        {% endif %}
-                        
-                        {% if college.net_price_30001_48000 is not none %}
-                        <tr>
-                            <td> $30,0001 - $48,000 </td>
-                            <td> ${{"{0:,.0f}".format(college.net_price_30001_48000)}} </td>
-                        </tr>
-                        {% endif %}
-                        
-                        {% if college.net_price_48001_75000 is not none %}
-                        <tr>
-                            <td> $48,001 - $75,000 </td>
-                            <td> ${{"{0:,.0f}".format(college.net_price_48001_75000)}} </td>
-                        </tr>
-                        {% endif %}
-
-                        {% if college.net_price_75001_110000 is not none %}
-                        <tr>
-                            <td> $75,001 - $110,000 </td>
-                            <td> ${{"{0:,.0f}".format(college.net_price_75001_110000)}} </td>
-                        </tr>
-                        {% endif %}
-
-                        {% if college.net_price_110001_plus is not none %}
-                        <tr>
-                            <td> $110,001 + </td>
-                            <td> ${{"{0:,.0f}".format(college.net_price_110001_plus)}} </td>
-                        </tr>
-                        {% endif %}
-
+                        {{ create_table_row('$0 - $30,000', college.net_price_0_30000, 'money') }}
+                        {{ create_table_row('$30,001 - $48,000', college.net_price_30001_48000, 'money') }}
+                        {{ create_table_row('$48,001 - $75,000', college.net_price_48001_75000, 'money') }}
+                        {{ create_table_row('$75,001 - $110,000', college.net_price_75001_110000, 'money') }}
+                        {{ create_table_row('$110,001 +', college.net_price_110001_plus, 'money') }}
                     </table>
- 
                 </div>
                 {% endif %}
-
             </div>
         </div>
 
+        {% if college.median_debt_first_gen is not none and college.median_debt_first_gen is not none and 
+            college.median_debt_income_0_30000 is not none and college.median_debt_income_30001_75000 is not none
+            and college.median_debt_income_75001_plus is not none %}
         <div class="ui raised secondary green segment college_info">
             <h1 class="ui header college_info_section_header">Debt</h1>
-            yikes
+                <div class="ui two column doubling stackable grid container flex_wrapper">
+                    {% if college.median_debt_first_gen is not none and college.median_debt_first_gen is not none%}
+                    <div class="column">
+                        {% if college.median_debt_first_gen is not none%}
+                        {{create_medium_stat_box("${0:,.0f}".format(college.median_debt_first_gen),
+                            'Median Debt of First Generation Students')}}
+                        {% endif %}
+                        {% if college.median_debt_first_gen is not none%}
+                        {{create_medium_stat_box("${0:,.0f}".format(college.median_debt_non_first_gen),
+                            'Median Debt of Non-First Generation Students')}}
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <div class="column">
+                        <table class="ui celled padded table college_info_table">
+                            <tr>
+                                <th>Family Income</th>
+                                <th style="margin-left:30px;">Median Debt</th>
+                            </tr>
+                            {{ create_table_row('$0 - $30,000', college.median_debt_income_0_30000, 'money') }}
+                            {{ create_table_row('$30,001 - $75,000', college.median_debt_income_30001_75000, 'money') }}
+                            {{ create_table_row('$75,001 + ', college.median_debt_income_75001_plus, 'money') }}
+                        </table>
+                    </div>
+
+
+
+                </div>
         </div>
+        {% endif %}
 
         <div class="ui raised secondary green segment">
             <h1 class="ui header college_info_section_header">Deadlines</h1>

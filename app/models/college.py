@@ -39,12 +39,17 @@ class College(db.Model):
     plot_SAT1600 = db.Column(db.String)
     plot_ACT = db.Column(db.String)
     
+    median_debt_income_0_30000 = db.Column(db.Integer, index=True)
+    median_debt_income_30001_75000 = db.Column(db.Integer, index=True)
+    median_debt_income_75001_plus = db.Column(db.Integer, index=True)
+    median_debt_first_gen = db.Column(db.Integer, index=True)
+    median_debt_non_first_gen = db.Column(db.Integer, index=True)
+
     net_price_0_30000 = db.Column(db.Integer, index=True)
     net_price_30001_48000 = db.Column(db.Integer, index=True)
     net_price_48001_75000 = db.Column(db.Integer, index=True)
     net_price_75001_110000 = db.Column(db.Integer, index=True)
     net_price_110001_plus = db.Column(db.Integer, index=True)
-
 
     image = db.Column(db.String, index=True)
     is_hispanic_serving = db.Column(db.Integer, index=True)
@@ -367,7 +372,15 @@ class College(db.Model):
                 year, '.cost.attendance.academic_year,',
                 year, '.cost.tuition.in_state,', 
                 year, '.cost.tuition.out_of_state,', 
+                
+                #aid/debt
+                year, '.aid.median_debt.income.0_30000,',
+                year, '.aid.median_debt.income.30001_75000,',
+                year, '.aid.median_debt.income.greater_than_75000,',
+                year, '.aid.median_debt.non_first_generation_students,',
+                year, '.aid.median_debt.first_generation_students,',
 
+                #costs
                 year, '.cost.net_price.public.by_income_level.0-30000,',
                 year, '.cost.net_price.public.by_income_level.30001-48000,',
                 year, '.cost.net_price.public.by_income_level.48001-75000,',
@@ -442,6 +455,17 @@ class College(db.Model):
             if result['school.ownership_peps'] is not None:
                 ownership_values = { 1 : 'public', 2 : 'private', 3 : 'proprietary'}
                 college.institution_type = ownership_values.get(result['school.ownership_peps'])
+            if result[y+'.aid.median_debt.income.0_30000'] is not None:
+                college.median_debt_income_0_30000 = result[y+'.aid.median_debt.income.0_30000']
+            if result[y+'.aid.median_debt.income.30001_75000'] is not None:
+                college.median_debt_income_30001_75000 = result[y+'.aid.median_debt.income.30001_75000']
+            if result[y+'.aid.median_debt.income.greater_than_75000'] is not None:
+                college.median_debt_income_75001_plus = result[y+'.aid.median_debt.income.greater_than_75000']
+            if result[y+'.aid.median_debt.first_generation_students'] is not None:
+                college.median_debt_first_gen = result[y+'.aid.median_debt.first_generation_students']
+            if result[y+'.aid.median_debt.non_first_generation_students'] is not None:
+                college.median_debt_non_first_gen = result[y+'.aid.median_debt.non_first_generation_students']
+            
             if result[y + '.student.size'] is not None:
                 college.school_size = result[y + '.student.size']
             if result['school.city'] is not None:
@@ -510,8 +534,8 @@ class College(db.Model):
             'Stanford University', 'Princeton University',
             'Harvard University', 'Cornell University', 'Yale University',
             'Brown University', 'Dartmouth College', 'New York University',
-            'University of California, Berkeley',
-            'University of California, Los Angeles', 'University of Michigan-Ann Arbor',
+            'University of California - Berkeley',
+            'University of California - Los Angeles', 'University of Michigan-Ann Arbor',
             'Carnegie Mellon University', 'John Hopkins University',
             'University of Chicago', 'Amherst College', 'Williams College',
             'Massachusetts Institute of Technology',

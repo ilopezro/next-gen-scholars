@@ -67,7 +67,7 @@
                     </div>
                 </div>
 
-                {% if college.sat_score_average_overall != 0.0 and college.act_score_average_overall != 0.0 %}
+                {% if college.sat_score_average_overall != 0.0 or college.act_score_average_overall != 0.0 %}
                 <div class="column">
                     {% if college.sat_score_average_overall != 0.0 %}
                         {{create_medium_stat_box("{0:,.0f}".format(college.sat_score_average_overall|round|int), 'Average SAT Score')}}
@@ -127,10 +127,10 @@
                     </div>
                 </div>
 
-                {% if college.net_price_0_30000 is not none and 
-                    college.net_price_30001_48000 is not none and
-                    college.net_price_48001_75000 is not none and
-                    college.net_price_75001_110000 is not none and
+                {% if college.net_price_0_30000 is not none or 
+                    college.net_price_30001_48000 is not none or
+                    college.net_price_48001_75000 is not none or
+                    college.net_price_75001_110000 is not none or
                     college.net_price_110001_plus is not none
                 %}
                 <div class="column">
@@ -150,13 +150,13 @@
             </div>
         </div>
 
-        {% if college.median_debt_first_gen is not none and college.median_debt_first_gen is not none and 
-            college.median_debt_income_0_30000 is not none and college.median_debt_income_30001_75000 is not none
-            and college.median_debt_income_75001_plus is not none %}
+        {% if college.median_debt_first_gen is not none or college.median_debt_first_gen is not none or 
+            college.median_debt_income_0_30000 is not none or college.median_debt_income_30001_75000 is not none
+            or college.median_debt_income_75001_plus is not none %}
         <div class="ui raised secondary green segment college_info">
             <h1 class="ui header college_info_section_header">Debt</h1>
                 <div class="ui two column doubling stackable grid container flex_wrapper">
-                    {% if college.median_debt_first_gen is not none and college.median_debt_first_gen is not none%}
+                    {% if college.median_debt_first_gen is not none or college.median_debt_first_gen is not none%}
                     <div class="column">
                         {% if college.median_debt_first_gen is not none%}
                         {{create_medium_stat_box("${0:,.0f}".format(college.median_debt_first_gen),
@@ -181,11 +181,42 @@
                         </table>
                     </div>
 
-
-
                 </div>
         </div>
         {% endif %}
+
+        <div class="ui raised secondary green segment college_info">
+            <h1 class="ui header college_info_section_header">Student Demographics</h1>
+                <div class="ui two column doubling stackable grid container flex_wrapper">
+                    {% if college.median_debt_first_gen is not none or college.median_debt_first_gen is not none%}
+                    <div class="column">
+                        {% if college.first_generation_percentage is not none%}
+                        <div class="column">
+                            {{ create_medium_stat_box(college.first_generation_percentage|string+'%', 'Percentage of First-Generation Students')}}
+                        </div>
+                        {% endif %}
+
+                       
+                    </div>
+                    {% endif %}
+
+                    <div class="column">
+                        <table class="ui celled padded table college_info_table">
+                            <tr>
+                                <th>Race</th>
+                                <th style="margin-left:30px;"> Percent of Student Body</th>
+                            </tr>
+                            {{ create_table_row('White', college.race_white, 'percent') }}
+                            {{ create_table_row('Black', college.race_black, 'percent') }}
+                            {{ create_table_row('Hispanic', college.race_hispanic, 'percent') }}
+                            {{ create_table_row('Asian', college.race_asian, 'percent') }}
+                            {{ create_table_row('Native American', college.race_american_indian, 'percent') }}
+                            {{ create_table_row('Native Hawaiian', college.race_native_hawaiian, 'percent') }}
+                        </table>
+                    </div>
+
+                </div>
+        </div>
 
         <div class="ui raised secondary green segment">
             <h1 class="ui header college_info_section_header">Deadlines</h1>
@@ -196,49 +227,7 @@
             <p><strong>Acceptance Deadline</strong>: {{ college.acceptance_deadline }}</p>
         </div>
 
-        <div class="ui raised secondary green segment" style="margin-bottom: 64px;"> 
-            <h1 class="ui header college_info_section_header"> Student Demographics </h1>
 
-            <p><strong> First Generation Students: {{ college.first_generation_percentage }}% </p></strong>
-
-
-            <table class="ui celled padded table">
-                <tr>
-                    <th>Race</th>
-                    <th>Percent</th>
-                </tr>
-                <tr>
-                    <td> White </td>
-                    <td> {{ college.first_generation_percentage }}%</td>
-                </tr>
-                <tr>
-                    <td> Black </td>
-                    <td>{{ college.race_black }}%</td>
-                </tr>
-                <tr>
-                    <td> Hispanic </td>
-                    <td> {{ college.race_hispanic }}% </td>
-                </tr>
-                <tr>
-                    <td> Asian </td>
-                    <td> {{ college.race_asian }}% </td>
-                </tr>
-                <tr>
-                    <td> Native American/Alaska Native </td>
-                    <td> {{ college.race_american_indian }}%</td>
-                </tr>
-                <tr>
-                    <td> Native Hawaiian/Pacific Islander </td>
-                    <td> {{ college.race_native_hawaiian }}%</td>
-                </tr>
-            </table>
-
-            
-            {% if college.race_international != 0 %}
-            <p><strong>{{ college.race_international }}%</strong> International</p>
-            {% endif %}
-
-        </div>
         {% if college.plot_SAT1600 %}
         <h4 class="ui header">GPA vs. SAT [1600] Scattergram</h4>
         <iframe width="900" height="480" frameborder="0" seamless="seamless" scrolling="no" src="{{college.plot_SAT1600}}.embed?showlink=false"></iframe>

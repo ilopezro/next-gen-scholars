@@ -204,6 +204,7 @@ table.selectable tr:hover {
 
 .college_info{
   text-align:center;
+  margin-bottom: 15px !important;
 }
 .flex_wrapper{
   justify-content: center;

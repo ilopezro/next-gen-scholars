@@ -12,13 +12,17 @@
 * Codirectors: Emily Everett and Melissa Gu
 * Wallace He, Jonathan Huang, Katrina Kuhn, Tracy Nguyen
 
+#### Summer Work
+* Bryant Lee
+* Rebecca Xun
+
 ## Setting up for Python 3
 __Must use Python3__
 
 #####  Clone the repo
 
 ```bash
-$ git clone https://github.com/hack4impact/next-gen-scholars.git
+$ git clone https://github.com/ilopezro/next-gen-scholars.git
 $ cd next-gen-scholars
 ```
 

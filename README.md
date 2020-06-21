@@ -12,6 +12,10 @@
 * Codirectors: Emily Everett and Melissa Gu
 * Wallace He, Jonathan Huang, Katrina Kuhn, Tracy Nguyen
 
+### Dream Team
+* Kyle Sayers
+* Bryant Lee
+
 ## Setting up for Python 3
 __Must use Python3__
 
